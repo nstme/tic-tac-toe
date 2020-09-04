@@ -1,33 +1,47 @@
 import {
   getBoardState,
   setBoardState,
-  // getCurrentUser,
-  // setCurrentUser,
-  // onBoardChange,
+  getCurrentPlayer,
+  setCurrentPlayer,
+  onBoardChange,
   // onUserChange,
   BoardState,
+  Player,
+  reset,
 } from '../';
 
+function setupBoard() {
+  setBoardState(0, 0, 'x');
+  setBoardState(0, 1, null);
+  setBoardState(0, 2, 'o');
+  setBoardState(1, 0, null);
+  setBoardState(1, 1, 'x');
+  setBoardState(1, 2, null);
+  setBoardState(2, 0, 'x');
+  setBoardState(2, 1, null);
+  setBoardState(2, 2, 'o');
+}
+
 describe('the State service', () => {
+  let player: Player | undefined;
+  let board: BoardState | undefined;
+
+  afterEach(() => {
+    reset();
+
+    player = undefined;
+    board = undefined;
+  });
+
   describe('getBoardState', () => {
-    let result: BoardState;
-
     beforeEach(() => {
-      setBoardState(0, 0, 'x');
-      setBoardState(0, 1, null);
-      setBoardState(0, 2, 'o');
-      setBoardState(1, 0, null);
-      setBoardState(1, 1, 'x');
-      setBoardState(1, 2, null);
-      setBoardState(2, 0, 'x');
-      setBoardState(2, 1, null);
-      setBoardState(2, 2, 'o');
+      setupBoard();
 
-      result = getBoardState();
+      board = getBoardState();
     });
 
     it('returns the board', () => {
-      expect(result).toEqual([
+      expect(board).toEqual([
         ['x', null, 'o'],
         [null, 'x', null],
         ['x', null, 'o'],
@@ -36,11 +50,94 @@ describe('the State service', () => {
   });
 
   describe('getCurrentUser', () => {
+    beforeEach(() => {
+      setCurrentPlayer(Player.PLAYER_1);
 
+      player = getCurrentPlayer();
+    });
+
+    it('returns the expected player', () => {
+      expect(player).toEqual(Player.PLAYER_1);
+    });
+  });
+
+  describe('reset', () => {
+    beforeEach(() => {
+      setCurrentPlayer(Player.PLAYER_1);
+      setupBoard();
+
+      reset();
+
+      player = getCurrentPlayer();
+      board = getBoardState();
+    });
+
+    it('resets the player', () => {
+      expect(player).toBeUndefined();
+    });
+
+    it('resets the board', () => {
+      expect(board).toEqual([
+        [null, null, null],
+        [null, null, null],
+        [null, null, null],
+      ])
+    });
   });
 
   describe('onBoardChange', () => {
 
+    describe('when onBoardChange is called before setBoardState', () => {
+      const onChange = jest.fn();
+
+      beforeEach(() => {
+        onBoardChange(onChange);
+
+        setBoardState(0, 0, 'x');
+      });
+
+      afterEach(() => {
+        onChange.mockClear();
+      });
+
+      it('calls the callback each time the board is updated', () => {
+        expect(onChange).toHaveBeenCalledTimes(2);
+      });
+
+      it('passes the current board state', () => {
+        expect(onChange).toHaveBeenLastCalledWith([
+          ['x', null, null],
+          [null, null, null],
+          [null, null, null],
+        ])
+      });
+    });
+
+    describe('when onBoardChange is called after setBoardState', () => {
+      const onChange = jest.fn();
+
+      beforeEach(() => {
+        setBoardState(0, 0, 'x');
+
+        onBoardChange(onChange);
+      });
+
+      afterEach(() => {
+        onChange.mockClear();
+      });
+
+      it('calls the callback each time the board is updated', () => {
+        expect(onChange).toHaveBeenCalledTimes(1);
+      });
+
+      it('passes the current board state', () => {
+        expect(onChange).toHaveBeenCalledWith([
+          ['x', null, null],
+          [null, null, null],
+          [null, null, null],
+        ])
+      });
+    });
   });
 
   describe('onUserChange', () => {

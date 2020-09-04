@@ -1,19 +1,29 @@
 export type BoardCell = 'x' | 'o' | null;
 export type BoardRow = BoardCell[];
 export type BoardState = BoardRow[];
+export type BoardChangeHandler = (board: BoardState) => void;
 export enum Player {
   PLAYER_1,
   PLAYER_2,
 }
 
-const board: BoardState = [
+let board: BoardState = [
   [null, null, null],
   [null, null, null],
   [null, null, null],
 ];
+let currentPlayer: Player | undefined;
+
+const boardHandlers = new Set<BoardChangeHandler>();
 
 export function getBoardState() {
   return [...board];
+}
+
+function emitBoardChangeEvent() {
+  boardHandlers.forEach(handler => {
+    handler([...board]);
+  });
 }
 
 export function setBoardState(row: number, col: number, value: BoardCell) {
@@ -26,4 +36,28 @@ export function setBoardState(row: number, col: number, value: BoardCell) {
   }
 
   board[row][col] = value;
+  emitBoardChangeEvent();
+}
+
+export function setCurrentPlayer(player: Player) {
+  currentPlayer = player;
+}
+
+export function getCurrentPlayer() {
+  return currentPlayer;
+}
+
+export function reset() {
+  board = [
+    [null, null, null],
+    [null, null, null],
+    [null, null, null],
+  ];
+  currentPlayer = undefined;
+}
+
+export function onBoardChange(onChange: BoardChangeHandler) {
+  boardHandlers.add(onChange);
+
+  onChange(board);
 }
