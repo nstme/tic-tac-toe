@@ -4,7 +4,7 @@ import {
   getCurrentPlayer,
   setCurrentPlayer,
   onBoardChange,
-  // onUserChange,
+  onPlayerChange,
   BoardState,
   Player,
   reset,
@@ -140,7 +140,49 @@ describe('the State service', () => {
     });
   });
 
-  describe('onUserChange', () => {
+  describe('onPlayerChange', () => {
+    describe('when onChange is called before setCurrentPlayer', () => {
+      const onChange = jest.fn();
 
+      beforeEach(() => {
+        onPlayerChange(onChange);
+        setCurrentPlayer(Player.PLAYER_1);
+      });
+
+      afterEach(() => {
+        onChange.mockClear();
+      });
+
+      it('calls the callback each time the board is updated', () => {
+        expect(onChange).toHaveBeenCalledTimes(2);
+      });
+
+      it('changes the current Player', () => {
+        player = getCurrentPlayer();
+        expect(player).toBe(Player.PLAYER_1);
+      });
+    });
+
+    describe('when onChange is called after setCurrentPlayer', () => {
+      const onChange = jest.fn();
+
+      beforeEach(() => {
+        setCurrentPlayer(Player.PLAYER_1);
+        onPlayerChange(onChange);
+      });
+
+      afterEach(() => {
+        onChange.mockClear();
+      });
+
+      it('calls the callback each time the board is updated', () => {
+        expect(onChange).toHaveBeenCalledTimes(1);
+      });
+
+      it('changes the current Player', () => {
+        player = getCurrentPlayer();
+        expect(player).toBe(Player.PLAYER_1);
+      });
+    });
   });
 });
