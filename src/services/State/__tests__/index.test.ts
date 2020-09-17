@@ -169,6 +169,8 @@ describe('the State service', () => {
       beforeEach(() => {
         setCurrentPlayer(Player.PLAYER_1);
         onPlayerChange(onChange);
+
+        player = getCurrentPlayer();
       });
 
       afterEach(() => {
@@ -180,7 +182,6 @@ describe('the State service', () => {
       });
 
       it('changes the current Player', () => {
-        player = getCurrentPlayer();
         expect(player).toBe(Player.PLAYER_1);
       });
     });
