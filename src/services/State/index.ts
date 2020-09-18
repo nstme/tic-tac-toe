@@ -3,6 +3,7 @@ export type BoardRow = BoardCell[];
 export type BoardState = BoardRow[];
 export type BoardChangeHandler = (board: BoardState) => void;
 export type PlayerChangeHandler = (currentPlayer: Player | undefined) => void;
+export type PlayerSetter = (player: Player) => void;
 export enum Player {
   PLAYER_1,
   PLAYER_2,
@@ -14,9 +15,11 @@ let board: BoardState = [
   [null, null, null],
 ];
 let currentPlayer: Player | undefined;
+let winningPlayer: Player | undefined;
 
 const boardHandlers = new Set<BoardChangeHandler>();
 const playerHandlers = new Set<PlayerChangeHandler>();
+const winHandlers = new Set<PlayerChangeHandler>();
 
 export function getBoardState() {
   return [...board];
@@ -30,6 +33,12 @@ function emitBoardChangeEvent() {
 
 function emitPlayerChangeEvent() {
   playerHandlers.forEach(handler => {
+    handler(currentPlayer);
+  });
+}
+
+function emitWinChangeEvent() {
+  winHandlers.forEach(handler => {
     handler(currentPlayer);
   });
 }
@@ -56,6 +65,15 @@ export function getCurrentPlayer() {
   return currentPlayer;
 }
 
+export function setWinningPlayer(player: Player) {
+  winningPlayer = player;
+  emitWinChangeEvent();
+}
+
+export function getWinningPlayer() {
+  return winningPlayer;
+}
+
 export function reset() {
   board = [
     [null, null, null],
@@ -63,6 +81,7 @@ export function reset() {
     [null, null, null],
   ];
   currentPlayer = undefined;
+  winningPlayer = undefined;
 }
 
 export function onBoardChange(onChange: BoardChangeHandler) {
@@ -75,4 +94,9 @@ export function onPlayerChange(onChange: PlayerChangeHandler) {
   playerHandlers.add(onChange);
 
   onChange(currentPlayer);
+};
+export function onPlayerWon(onChange: PlayerChangeHandler) {
+  winHandlers.add(onChange);
+
+  onChange(winningPlayer);
 };

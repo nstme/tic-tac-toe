@@ -8,6 +8,9 @@ import {
   BoardState,
   Player,
   reset,
+  getWinningPlayer,
+  setWinningPlayer,
+  onPlayerWon,
 } from '../';
 
 function setupBoard() {
@@ -85,6 +88,22 @@ describe('the State service', () => {
     });
   });
 
+  describe('getWinningPlayer', () => {
+    beforeEach(() => {
+      setWinningPlayer(Player.PLAYER_1);
+
+      player = getWinningPlayer();
+    });
+
+    it('returns the expected player', () => {
+      expect(player).toEqual(Player.PLAYER_1);
+    });
+  });
+
+  describe('onPlayerWon', () => {
+
+  });
+
   describe('onBoardChange', () => {
 
     describe('when onBoardChange is called before setBoardState', () => {
@@ -147,6 +166,7 @@ describe('the State service', () => {
       beforeEach(() => {
         onPlayerChange(onChange);
         setCurrentPlayer(Player.PLAYER_1);
+        player = getCurrentPlayer();
       });
 
       afterEach(() => {
@@ -158,7 +178,6 @@ describe('the State service', () => {
       });
 
       it('changes the current Player', () => {
-        player = getCurrentPlayer();
         expect(player).toBe(Player.PLAYER_1);
       });
     });
@@ -171,6 +190,55 @@ describe('the State service', () => {
         onPlayerChange(onChange);
 
         player = getCurrentPlayer();
+      });
+
+      afterEach(() => {
+        onChange.mockClear();
+      });
+
+      it('calls the callback each time the board is updated', () => {
+        expect(onChange).toHaveBeenCalledTimes(1);
+      });
+
+      it('changes the current Player', () => {
+        expect(player).toBe(Player.PLAYER_1);
+      });
+    });
+  });
+
+
+  describe('onPlayerWon', () => {
+    describe('when onChange is called before setCurrentPlayer', () => {
+      const onChange = jest.fn();
+
+      beforeEach(() => {
+        onPlayerWon(onChange);
+        setWinningPlayer(Player.PLAYER_1);
+
+        player = getWinningPlayer();
+      });
+
+      afterEach(() => {
+        onChange.mockClear();
+      });
+
+      it('calls the callback each time the board is updated', () => {
+        expect(onChange).toHaveBeenCalledTimes(2);
+      });
+
+      it('changes the winning Player', () => {
+        expect(player).toBe(Player.PLAYER_1);
+      });
+    });
+
+    describe('when onChange is called after setWinningPlayer', () => {
+      const onChange = jest.fn();
+
+      beforeEach(() => {
+        setWinningPlayer(Player.PLAYER_1);
+        onPlayerWon(onChange);
+
+        player = getWinningPlayer();
       });
 
       afterEach(() => {
