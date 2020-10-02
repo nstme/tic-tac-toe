@@ -1,15 +1,45 @@
+import { random } from 'faker';
 import winDetectorFactory from '../';
 import { BoardState, Player } from '../../State';
 
 function getWinningBoard(): BoardState {
-  return [
-    ['x', 'x', 'x'],
-    [null, 'o', 'o'],
-    [null, null, null],
-  ]
+  const boards: BoardState[] = [
+    [
+      ['x', 'x', 'x'],
+      ['o', 'x', 'o'],
+      [null, 'o', 'o'],
+    ],
+    [
+      [null, 'x', 'x'],
+      ['o', 'o', 'o'],
+      [null, 'x', 'o'],
+    ],
+    [
+      [null, 'x', 'o'],
+      ['o', 'o', 'o'],
+      [null, 'x', 'o'],
+    ],
+    [
+      [null, 'x', 'o'],
+      ['o', 'x', 'x'],
+      [null, 'x', 'o'],
+    ],
+    [
+      [null, 'x', 'x'],
+      ['o', 'x', 'x'],
+      ['x', 'x', 'o'],
+    ],
+    [
+      ['o', 'x', 'x'],
+      ['o', 'o', 'x'],
+      ['x', 'x', 'o'],
+    ],
+  ];
+
+  return random.arrayElement<BoardState>(boards);
 }
 
-function getLoosingBoard(): BoardState {
+function getLosingBoard(): BoardState {
   return [
     ['x', 'o', 'x'],
     [null, 'o', 'o'],
@@ -23,7 +53,7 @@ describe('WinDetector', () => {
 
   describe('a losing board state', () => {
     beforeEach(() => {
-      const board = getLoosingBoard();
+      const board = getLosingBoard();
 
       winDetector(board);
     });

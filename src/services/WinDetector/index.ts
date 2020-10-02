@@ -1,47 +1,87 @@
-import { BoardChangeHandler, BoardState, Player, PlayerSetter, BoardCell, getCurrentPlayer } from "../State";
+import { BoardChangeHandler, BoardState, Player, PlayerSetter, BoardCell } from "../State";
+
+type VertexWinDetector = (board: BoardState) => BoardCell;
+
+function isWinningVertex(vertex: BoardCell[]) {
+  return vertex[0] !== null && vertex[0] === vertex[1] && vertex[0] === vertex[2]
+}
+
+const detectWinningRow: VertexWinDetector = (board: BoardState) => {
+  let r = 0;
+
+  while (r < 3) {
+    const row = board[r];
+
+    if (isWinningVertex(row)) {
+      return row[0];
+    }
+
+    r += 1;
+  }
+
+  return null;
+}
+
+const detectWinningCol: VertexWinDetector = (board: BoardState) => {
+  let c = 0;
+
+  while (c < 3) {
+    const col = [
+      board[0][c],
+      board[1][c],
+      board[2][c],
+    ];
+
+    if (isWinningVertex(col)) {
+      return col[0];
+    }
+
+    c += 1;
+  }
+
+  return null;
+}
+
+const detectWinningDiag: VertexWinDetector = (board: BoardState) => {
+  const points = [
+    [0, 0],
+    [2, 0],
+  ];
+  let p = 0;
+
+  while (p < points.length) {
+    const point = points[p];
+    const m = point[0] === 0 ? 1 : -1;
+    const diag = [
+      board[point[0]][point[1]],
+      board[point[0] + m][point[1] + 1],
+      board[point[0] + (m * 2)][point[1] + 2],
+    ];
+
+    if (isWinningVertex(diag)) {
+      return diag[0];
+    }
+
+    p += 1;
+  }
+
+  return null;
+}
 
 export default function winDetectorFactory(setWinningPlayer: PlayerSetter) {
   const winDetector: BoardChangeHandler = (board: BoardState) => {
     // examine board state for a win
     // -- if there's a win, call setWinningPlayer(currentPlayer)
     // -- else, do nothing
-    const cell1: BoardCell = board[0][0];
-    const cell2: BoardCell = board[0][1];
-    const cell3: BoardCell = board[0][2];
-    const cell4: BoardCell = board[1][0];
-    const cell5: BoardCell = board[1][1];
-    const cell6: BoardCell = board[1][2];
-    const cell7: BoardCell = board[2][0];
-    const cell8: BoardCell = board[2][1];
-    const cell9: BoardCell = board[2][2];
+    let winningToken: BoardCell = null;
 
-    function hasWinningRow () {
-      return ((cell1 === cell2 && cell2 === cell3 && cell3 !== null) ||
-        (cell4 === cell5 && cell5 === cell6 && cell6 !== null) ||
-      (cell7 === cell8 && cell8 === cell9 && cell9 !== null))
-      ? true : false;
-    };
+    winningToken = detectWinningRow(board)
+      || detectWinningCol(board)
+      || detectWinningDiag(board);
 
-    function hasWinningColumn() {
-      return ((cell1 === cell4 && cell4 === cell7 && cell7 !== null) ||
-        (cell2 === cell5 && cell5 === cell8 && cell8 !== null) ||
-        (cell3 === cell6 && cell6 === cell9 && cell9 !== null))
-        ? true : false;
-    };
-
-    function hasWinningDiagonal() {
-      return ((cell1 === cell5 && cell5 === cell9 && cell9 !== null) ||
-        (cell3 === cell5 && cell5 === cell7 && cell7 !== null))
-        ? true : false;
-    };
-
-    if (hasWinningRow() || hasWinningColumn() || hasWinningDiagonal()) {
-      console.log({ board });
-      let currentPlayer: Player | undefined = getCurrentPlayer();
-      currentPlayer = Player.PLAYER_1; //temp for testing
-      setWinningPlayer(currentPlayer);
-    };
-    return;
+    if (winningToken !== null) {
+      setWinningPlayer(Player.PLAYER_1);
+    }
   };
 
   return winDetector;
