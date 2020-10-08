@@ -5,7 +5,7 @@ export type BoardChangeHandler = (board: BoardState) => void;
 export type PlayerChangeHandler = (currentPlayer: Player | undefined) => void;
 export type PlayerSetter = (player: Player) => void;
 export enum Player {
-  PLAYER_1,
+  PLAYER_1 = 1,
   PLAYER_2,
 }
 
