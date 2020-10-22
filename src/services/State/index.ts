@@ -14,6 +14,66 @@ let board: BoardState = [
   [null, null, null],
   [null, null, null],
 ];
+
+let potentialWins = {
+  'row-1': {
+    didWin: true,
+    isWinnable: true,
+    currentState: ['o', 'o', null],
+    value: 2,
+    player: Player.PLAYER_2,
+  },
+  'row-2': {
+    didWin: true,
+    isWinnable: true,
+    currentState: ['x', null, null],
+    value: 1,
+    player: Player.PLAYER_1,
+  },
+  'row-3': {
+    didWin: true,
+    isWinnable: true,
+    currentState: [null, null, null],
+    value: 0,
+    player: undefined,
+  },
+  'col-1': {
+    didWin: true,
+    isWinnable: false,
+    currentState: ['o', 'x', null],
+    value: 0,
+    player: undefined,
+  },
+  'col-2': {
+    didWin: true,
+    isWinnable: true,
+    currentState: ['o', null, null],
+    value: 1,
+    player: Player.PLAYER_2,
+  },
+  'col-3': {
+    didWin: true,
+    isWinnable: true,
+    currentState: [null, null, null],
+    value: 0,
+    player: undefined,
+  },
+  'dia-1': {
+    didWin: true,
+    isWinnable: true,
+    currentState: ['o', null, null],
+    value: 1,
+    player: Player.PLAYER_2,
+  },
+  'dia-2': {
+    didWin: true,
+    isWinnable: false,
+    currentState: [null, null, null],
+    value: 0,
+    player: undefined,
+  },
+};
+
 let currentPlayer: Player | undefined;
 let winningPlayer: Player | undefined;
 
@@ -83,6 +143,8 @@ export function reset() {
   currentPlayer = undefined;
   winningPlayer = undefined;
 }
+
+// export function onPlayerMove(onChange: )
 
 export function onBoardChange(onChange: BoardChangeHandler) {
   boardHandlers.add(onChange);

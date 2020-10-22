@@ -22,20 +22,41 @@ import {
   //  }
 //}
 
+const valueMap = new Map<string, number>();
+
+function initMap() {
+  valueMap.set('0,0', 3);
+  valueMap.set('0,1', 2);
+  valueMap.set('0,2', 3);
+  valueMap.set('1,1', 5);
+}
+
+function onPlayerMove(row: number, col: number, value: BoardCell) {
+  const key = `${row},${col}`;
+
+  valueMap.delete(key);
+}
+
 export default function makeAiMove(board: BoardState) {
-  let currentCell: BoardCell;
-  let currentRow: BoardRow;
-  // let newBoard: BoardState = [...board];
+  // detect possible winning move to block (them)
+  // detect possible winning move to make (us)
+  // sort valueMap by value
+  // make move at highest value square
+
+
+
+  // let currentCell: BoardCell;
+  // let currentRow: BoardRow;
+  // // let newBoard: BoardState = [...board];
   
-  for (let r = 0; r < board.length; r += 1 ) {
-    currentRow = board[r];
-    for (let c = 0; c < currentRow.length; c += 1) {
-      currentCell = currentRow[c];
-      // console.log('current cell:', currentCell, ', position:', r, ' ', c );
-      if (!currentCell) {
-        // check if making a move to current cell will make AI winner
-      }
-    }
-  };
-  return;
+  // for (let r = 0; r < board.length; r += 1 ) {
+  //   currentRow = board[r];
+  //   for (let c = 0; c < currentRow.length; c += 1) {
+  //     currentCell = currentRow[c];
+  //     // console.log('current cell:', currentCell, ', position:', r, ' ', c );
+  //     if (!currentCell) {
+  //       // check if making a move to current cell will make AI winner
+  //     }
+  //   }
+  // };
 };
