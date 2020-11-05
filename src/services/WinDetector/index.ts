@@ -1,4 +1,4 @@
-import { BoardChangeHandler, BoardState, Player, PlayerSetter, BoardCell } from "../State";
+import { BoardChangeHandler, BoardState, Player, PlayerSetter, BoardCell, PotentialWins } from "../State";
 
 type VertexWinDetector = (board: BoardState) => BoardCell;
 
@@ -69,7 +69,7 @@ const detectWinningDiag: VertexWinDetector = (board: BoardState) => {
 }
 
 export default function winDetectorFactory(setWinningPlayer: PlayerSetter) {
-  const winDetector: BoardChangeHandler = (board: BoardState) => {
+  const winDetector: BoardChangeHandler = (board: BoardState, winState: PotentialWins) => {
     // examine board state for a win
     // -- if there's a win, call setWinningPlayer(currentPlayer)
     // -- else, do nothing

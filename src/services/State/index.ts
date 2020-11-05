@@ -1,79 +1,31 @@
 export type BoardCell = 'x' | 'o' | null;
 export type BoardRow = BoardCell[];
 export type BoardState = BoardRow[];
-export type BoardChangeHandler = (board: BoardState) => void;
+export type BoardChangeHandler = (board: BoardState, winState: PotentialWins) => void;
 export type PlayerChangeHandler = (currentPlayer: Player | undefined) => void;
 export type PlayerSetter = (player: Player) => void;
 export enum Player {
-  PLAYER_1 = 1,
+  PLAYER_1,
   PLAYER_2,
 }
+export type WinDirection = 'row-1' | 'row-2' | 'row-3' | 'col-1' | 'col-2' | 'col-3' | 'dia-1' | 'dia-2';
+export enum WinState {
+  WINNABLE,
+  NOT_WINNABLE,
+  WON,
+}
+export interface PotentialWinData {
+  currentState: BoardCell[];
+  player: Player | null;
+  state: WinState;
+  cellCount: number;
+}
+export interface PotentialWins {
+  [key: string]: PotentialWinData;
+}
 
-let board: BoardState = [
-  [null, null, null],
-  [null, null, null],
-  [null, null, null],
-];
-
-let potentialWins = {
-  'row-1': {
-    didWin: true,
-    isWinnable: true,
-    currentState: ['o', 'o', null],
-    value: 2,
-    player: Player.PLAYER_2,
-  },
-  'row-2': {
-    didWin: true,
-    isWinnable: true,
-    currentState: ['x', null, null],
-    value: 1,
-    player: Player.PLAYER_1,
-  },
-  'row-3': {
-    didWin: true,
-    isWinnable: true,
-    currentState: [null, null, null],
-    value: 0,
-    player: undefined,
-  },
-  'col-1': {
-    didWin: true,
-    isWinnable: false,
-    currentState: ['o', 'x', null],
-    value: 0,
-    player: undefined,
-  },
-  'col-2': {
-    didWin: true,
-    isWinnable: true,
-    currentState: ['o', null, null],
-    value: 1,
-    player: Player.PLAYER_2,
-  },
-  'col-3': {
-    didWin: true,
-    isWinnable: true,
-    currentState: [null, null, null],
-    value: 0,
-    player: undefined,
-  },
-  'dia-1': {
-    didWin: true,
-    isWinnable: true,
-    currentState: ['o', null, null],
-    value: 1,
-    player: Player.PLAYER_2,
-  },
-  'dia-2': {
-    didWin: true,
-    isWinnable: false,
-    currentState: [null, null, null],
-    value: 0,
-    player: undefined,
-  },
-};
-
+let board: BoardState;
+let potentialWins: PotentialWins;
 let currentPlayer: Player | undefined;
 let winningPlayer: Player | undefined;
 
@@ -85,9 +37,13 @@ export function getBoardState() {
   return [...board];
 }
 
+export function getPotentialWinState() {
+  return { ...potentialWins };
+}
+
 function emitBoardChangeEvent() {
   boardHandlers.forEach(handler => {
-    handler([...board]);
+    handler([...board], { ...potentialWins });
   });
 }
 
@@ -113,6 +69,8 @@ export function setBoardState(row: number, col: number, value: BoardCell) {
   }
 
   board[row][col] = value;
+  // update potentialWins cache
+
   emitBoardChangeEvent();
 }
 
@@ -134,22 +92,39 @@ export function getWinningPlayer() {
   return winningPlayer;
 }
 
+function getEmptyWinData(): PotentialWinData {
+  return {
+    state: WinState.WINNABLE,
+    currentState: [],
+    player: null,
+    cellCount: 0,
+  }
+}
+
 export function reset() {
   board = [
     [null, null, null],
     [null, null, null],
     [null, null, null],
   ];
+  potentialWins = {
+    'row-1': getEmptyWinData(),
+    'row-2': getEmptyWinData(),
+    'row-3': getEmptyWinData(),
+    'col-1': getEmptyWinData(),
+    'col-2': getEmptyWinData(),
+    'col-3': getEmptyWinData(),
+    'dia-1': getEmptyWinData(),
+    'dia-2': getEmptyWinData(),
+  };
   currentPlayer = undefined;
   winningPlayer = undefined;
 }
 
-// export function onPlayerMove(onChange: )
-
 export function onBoardChange(onChange: BoardChangeHandler) {
   boardHandlers.add(onChange);
 
-  onChange(board);
+  onChange(board, potentialWins);
 }
 
 export function onPlayerChange(onChange: PlayerChangeHandler) {

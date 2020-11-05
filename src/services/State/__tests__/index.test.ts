@@ -11,6 +11,9 @@ import {
   getWinningPlayer,
   setWinningPlayer,
   onPlayerWon,
+  getPotentialWinState,
+  PotentialWins,
+  WinState,
 } from '../';
 
 function setupBoard() {
@@ -28,12 +31,18 @@ function setupBoard() {
 describe('the State service', () => {
   let player: Player | undefined;
   let board: BoardState | undefined;
+  let potentialWins: PotentialWins | undefined;
+
+  beforeEach(() => {
+    reset();
+  });
 
   afterEach(() => {
     reset();
 
     player = undefined;
     board = undefined;
+    potentialWins = undefined;
   });
 
   describe('getBoardState', () => {
@@ -49,6 +58,66 @@ describe('the State service', () => {
         [null, 'x', null],
         ['x', null, 'o'],
       ]);
+    });
+  });
+
+  describe('getPotentialWinState', () => {
+    beforeEach(() => {
+      setupBoard();
+
+      potentialWins = getPotentialWinState();
+    });
+
+    it.only('returns the potentialWins', () => {
+      expect(potentialWins).toEqual({
+        'row-1': {
+          currentState: ['x', null, 'o'],
+          player: null,
+          state: WinState.NOT_WINNABLE,
+          cellCount: 2,
+        },
+        'row-2': {
+          currentState: [null, 'x', null],
+          player: Player.PLAYER_1,
+          state: WinState.WINNABLE,
+          cellCount: 1,
+        },
+        'row-3': {
+          currentState: ['x', null, 'o'],
+          player: null,
+          state: WinState.NOT_WINNABLE
+        },
+        'col-1': {
+          currentState: ['x', null, 'x'],
+          player: Player.PLAYER_1,
+          state: WinState.WINNABLE,
+          cellCount: 2,
+        },
+        'col-2': {
+          currentState: [null, 'x', null],
+          player: Player.PLAYER_1,
+          state: WinState.WINNABLE,
+          cellCount: 1,
+        },
+        'col-3': {
+          currentState: ['o', null, 'o'],
+          player: Player.PLAYER_2,
+          state: WinState.WINNABLE,
+          cellCount: 2,
+        },
+        'dia-1': {
+          currentState: ['x', 'x', 'o'],
+          player: null,
+          state: WinState.NOT_WINNABLE,
+          cellCount: 3,
+        },
+        'dia-2': {
+          currentState: ['x', 'x', 'o'],
+          player: null,
+          state: WinState.NOT_WINNABLE,
+          cellCount: 3,
+        },
+      });
     });
   });
 
