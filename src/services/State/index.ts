@@ -75,18 +75,54 @@ function getVertices(row: number, col: number) {
   if (verticesToUpdate === undefined) {
     throw new Error('vertix is not defined')
   }
+
   return verticesToUpdate;
 }
 
-function getStateIndex(vertex: WinDirection) {
-  
+function getStateIndex(row: number, col: number, vertex: WinDirection) {
+  const dir = vertex.substring(0, 3);
+
+  if (dir === 'col') {
+    return row;
+  }
+
+  // dia, col
+  return col;
 }
 
-function updateCurrentState(row: number, col: number, value: BoardCell, vertex: WinDirection) {
-  
+function getRowCount(vertex: WinDirection, value: BoardCell) {
+  return potentialWins[vertex].currentState.filter(cellValue => cellValue !== value).length;
 }
 
-export function setBoardState(row: number, col: number, value: BoardCell) {
+function getWinState(vertex: WinDirection) {
+  const xCount = potentialWins[vertex].cellCount = getRowCount(vertex, 'x');
+  const oCount = potentialWins[vertex].cellCount = getRowCount(vertex, 'o');
+
+  if (xCount !== 0 && oCount !== 0) {
+    return WinState.NOT_WINNABLE;
+  }
+
+  if (xCount === 3 || oCount === 3) {
+    return WinState.WON;
+  }
+
+  return WinState.WINNABLE;
+}
+
+function updateCurrentState(row: number, col: number, value: BoardCell, vertex: WinDirection, player: Player) {
+  const stateIndex = getStateIndex(row, col, vertex);
+
+  if (potentialWins[vertex].currentState[stateIndex] !== null) {
+    throw new Error("Can't play the same cell twice!");
+  }
+
+  potentialWins[vertex].currentState[stateIndex] = value;
+  potentialWins[vertex].cellCount = getRowCount(vertex, null);
+  potentialWins[vertex].player = potentialWins[vertex].player = player;
+  potentialWins[vertex].state = potentialWins[vertex].state = getWinState(vertex);
+}
+
+export function setBoardState(row: number, col: number, value: BoardCell, player: Player) {
   if (row < 0 || row > 2 || col < 0 || col > 2) {
     throw new Error(`row and col must be integers between 0 and 2, but I received row: ${row}, col: ${col}`);
   }
@@ -99,12 +135,7 @@ export function setBoardState(row: number, col: number, value: BoardCell) {
   // update potentialWins cache
   const verticesToUpdate = getVertices(row, col);
   verticesToUpdate.forEach((vertex: WinDirection) => {
-    potentialWins[vertex] = {
-      currentState: updateCurrentState(row, col, value, vertex),// ???;
-      player: getPotentialWinner(), // if WinState.WINNABLE or WON, set to getCurrentPlayer()
-      state: getWinState(), // null+any other - winable, x and o - not winnable;  all same - won
-      cellCount: getCellCount(), //count truthy values in vertex
-    }
+    updateCurrentState(row, col, value, vertex, player);
   })
 
   emitBoardChangeEvent();
