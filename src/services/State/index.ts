@@ -32,7 +32,17 @@ let winningPlayer: Player | undefined;
 const boardHandlers = new Set<BoardChangeHandler>();
 const playerHandlers = new Set<PlayerChangeHandler>();
 const winHandlers = new Set<PlayerChangeHandler>();
-const boardMap = new Map<number[], String[]>();
+const boardMap = new Map<number[], WinDirection[]>();
+
+boardMap.set([0, 0], ['row-1', 'col-1', 'dia-1']);
+boardMap.set([0, 1], ['row-1', 'col-2']);
+boardMap.set([0, 2], ['row-1', 'col-3', 'dia-2']);
+boardMap.set([1, 0], ['row-2', 'col-1']);
+boardMap.set([1, 1], ['row-2', 'col-2', 'dia-1', 'dia-2']);
+boardMap.set([1, 2], ['row-2', 'col-3']);
+boardMap.set([2, 0], ['row-3', 'col-1', 'dia-2']);
+boardMap.set([2, 1], ['row-3', 'col-2']);
+boardMap.set([2, 2], ['row-3', 'col-3', 'dia-1']);
 
 export function getBoardState() {
   return [...board];
@@ -60,19 +70,21 @@ function emitWinChangeEvent() {
   });
 }
 
-export function setUpBoardMap() {
-  boardMap.set([0, 0], ['row-1', 'col-1', 'dia-1']);
-  boardMap.set([0, 1], ['row-1', 'col-2']);
-  boardMap.set([0, 2], ['row-1', 'col-3', 'dia-2']);
-  boardMap.set([1, 0], ['row-2', 'col-1']);
-  boardMap.set([1, 1], ['row-2', 'col-2', 'dia-1', 'dia-2']);
-  boardMap.set([1, 2], ['row-2', 'col-3']);
-  boardMap.set([2, 0], ['row-3', 'col-1', 'dia-2']);
-  boardMap.set([2, 1], ['row-3', 'col-2']);
-  boardMap.set([2, 2], ['row-3', 'col-3', 'dia-1']);
-  return boardMap;
+function getVertices(row: number, col: number) {
+  const verticesToUpdate: WinDirection[] | undefined = boardMap.get([row, col]);
+  if (verticesToUpdate === undefined) {
+    throw new Error('vertix is not defined')
+  }
+  return verticesToUpdate;
 }
 
+function getStateIndex(vertex: WinDirection) {
+  
+}
+
+function updateCurrentState(row: number, col: number, value: BoardCell, vertex: WinDirection) {
+  
+}
 
 export function setBoardState(row: number, col: number, value: BoardCell) {
   if (row < 0 || row > 2 || col < 0 || col > 2) {
@@ -85,14 +97,13 @@ export function setBoardState(row: number, col: number, value: BoardCell) {
 
   board[row][col] = value;
   // update potentialWins cache
-  const boardMap = setUpBoardMap();
-  const verticesToUpdate: String[] | undefined = boardMap.get([row, col]);
-  verticesToUpdate.forEach((vertex) => {
-    potentialWins.vertex = {
-      currentState: updateCurrentState();// ???;
-      player: getPotentialWinner(); // if WinState.WINNABLE or WON, set to getCurrentPlayer()
-      state: getWinState(); // null+any other - winable, x and o - not winnable;  all same - won
-      cellCount: getCellCount(); //count truthy values in vertex
+  const verticesToUpdate = getVertices(row, col);
+  verticesToUpdate.forEach((vertex: WinDirection) => {
+    potentialWins[vertex] = {
+      currentState: updateCurrentState(row, col, value, vertex),// ???;
+      player: getPotentialWinner(), // if WinState.WINNABLE or WON, set to getCurrentPlayer()
+      state: getWinState(), // null+any other - winable, x and o - not winnable;  all same - won
+      cellCount: getCellCount(), //count truthy values in vertex
     }
   })
 
