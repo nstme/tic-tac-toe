@@ -1,16 +1,9 @@
 import {
   getBoardState,
   setBoardState,
-  getCurrentPlayer,
-  setCurrentPlayer,
   onBoardChange,
-  onPlayerChange,
   BoardState,
-  Player,
   reset,
-  getWinningPlayer,
-  setWinningPlayer,
-  onPlayerWon,
   getPotentialWinState,
   PotentialWins,
   WinState,
@@ -28,8 +21,7 @@ function setupBoard() {
   setBoardState(2, 2, 'o');
 }
 
-describe('the State service', () => {
-  let player: Player | undefined;
+describe.only('the State service', () => {
   let board: BoardState | undefined;
   let potentialWins: PotentialWins | undefined;
 
@@ -40,7 +32,6 @@ describe('the State service', () => {
   afterEach(() => {
     reset();
 
-    player = undefined;
     board = undefined;
     potentialWins = undefined;
   });
@@ -72,48 +63,41 @@ describe('the State service', () => {
       expect(potentialWins).toEqual({
         'row-1': {
           currentState: ['x', null, 'o'],
-          player: null,
           state: WinState.NOT_WINNABLE,
           cellCount: 2,
         },
         'row-2': {
           currentState: [null, 'x', null],
-          player: Player.PLAYER_1,
           state: WinState.WINNABLE,
           cellCount: 1,
         },
         'row-3': {
           currentState: ['x', null, 'o'],
-          player: null,
-          state: WinState.NOT_WINNABLE
+          state: WinState.NOT_WINNABLE,
+          cellCount: 2,
         },
         'col-1': {
           currentState: ['x', null, 'x'],
-          player: Player.PLAYER_1,
           state: WinState.WINNABLE,
           cellCount: 2,
         },
         'col-2': {
           currentState: [null, 'x', null],
-          player: Player.PLAYER_1,
           state: WinState.WINNABLE,
           cellCount: 1,
         },
         'col-3': {
           currentState: ['o', null, 'o'],
-          player: Player.PLAYER_2,
           state: WinState.WINNABLE,
           cellCount: 2,
         },
         'dia-1': {
           currentState: ['x', 'x', 'o'],
-          player: null,
           state: WinState.NOT_WINNABLE,
           cellCount: 3,
         },
         'dia-2': {
           currentState: ['x', 'x', 'o'],
-          player: null,
           state: WinState.NOT_WINNABLE,
           cellCount: 3,
         },
@@ -121,31 +105,13 @@ describe('the State service', () => {
     });
   });
 
-  describe('getCurrentUser', () => {
-    beforeEach(() => {
-      setCurrentPlayer(Player.PLAYER_1);
-
-      player = getCurrentPlayer();
-    });
-
-    it('returns the expected player', () => {
-      expect(player).toEqual(Player.PLAYER_1);
-    });
-  });
-
   describe('reset', () => {
     beforeEach(() => {
-      setCurrentPlayer(Player.PLAYER_1);
       setupBoard();
 
       reset();
 
-      player = getCurrentPlayer();
       board = getBoardState();
-    });
-
-    it('resets the player', () => {
-      expect(player).toBeUndefined();
     });
 
     it('resets the board', () => {
@@ -155,22 +121,6 @@ describe('the State service', () => {
         [null, null, null],
       ])
     });
-  });
-
-  describe('getWinningPlayer', () => {
-    beforeEach(() => {
-      setWinningPlayer(Player.PLAYER_1);
-
-      player = getWinningPlayer();
-    });
-
-    it('returns the expected player', () => {
-      expect(player).toEqual(Player.PLAYER_1);
-    });
-  });
-
-  describe('onPlayerWon', () => {
-
   });
 
   describe('onBoardChange', () => {
@@ -224,102 +174,6 @@ describe('the State service', () => {
           [null, null, null],
           [null, null, null],
         ])
-      });
-    });
-  });
-
-  describe('onPlayerChange', () => {
-    describe('when onChange is called before setCurrentPlayer', () => {
-      const onChange = jest.fn();
-
-      beforeEach(() => {
-        onPlayerChange(onChange);
-        setCurrentPlayer(Player.PLAYER_1);
-        player = getCurrentPlayer();
-      });
-
-      afterEach(() => {
-        onChange.mockClear();
-      });
-
-      it('calls the callback each time the board is updated', () => {
-        expect(onChange).toHaveBeenCalledTimes(2);
-      });
-
-      it('changes the current Player', () => {
-        expect(player).toBe(Player.PLAYER_1);
-      });
-    });
-
-    describe('when onChange is called after setCurrentPlayer', () => {
-      const onChange = jest.fn();
-
-      beforeEach(() => {
-        setCurrentPlayer(Player.PLAYER_1);
-        onPlayerChange(onChange);
-
-        player = getCurrentPlayer();
-      });
-
-      afterEach(() => {
-        onChange.mockClear();
-      });
-
-      it('calls the callback each time the board is updated', () => {
-        expect(onChange).toHaveBeenCalledTimes(1);
-      });
-
-      it('changes the current Player', () => {
-        expect(player).toBe(Player.PLAYER_1);
-      });
-    });
-  });
-
-
-  describe('onPlayerWon', () => {
-    describe('when onChange is called before setCurrentPlayer', () => {
-      const onChange = jest.fn();
-
-      beforeEach(() => {
-        onPlayerWon(onChange);
-        setWinningPlayer(Player.PLAYER_1);
-
-        player = getWinningPlayer();
-      });
-
-      afterEach(() => {
-        onChange.mockClear();
-      });
-
-      it('calls the callback each time the board is updated', () => {
-        expect(onChange).toHaveBeenCalledTimes(2);
-      });
-
-      it('changes the winning Player', () => {
-        expect(player).toBe(Player.PLAYER_1);
-      });
-    });
-
-    describe('when onChange is called after setWinningPlayer', () => {
-      const onChange = jest.fn();
-
-      beforeEach(() => {
-        setWinningPlayer(Player.PLAYER_1);
-        onPlayerWon(onChange);
-
-        player = getWinningPlayer();
-      });
-
-      afterEach(() => {
-        onChange.mockClear();
-      });
-
-      it('calls the callback each time the board is updated', () => {
-        expect(onChange).toHaveBeenCalledTimes(1);
-      });
-
-      it('changes the current Player', () => {
-        expect(player).toBe(Player.PLAYER_1);
       });
     });
   });

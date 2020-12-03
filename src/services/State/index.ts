@@ -2,12 +2,6 @@ export type BoardCell = 'x' | 'o' | null;
 export type BoardRow = BoardCell[];
 export type BoardState = BoardRow[];
 export type BoardChangeHandler = (board: BoardState, winState: PotentialWins) => void;
-export type PlayerChangeHandler = (currentPlayer: Player | undefined) => void;
-export type PlayerSetter = (player: Player) => void;
-export enum Player {
-  PLAYER_1,
-  PLAYER_2,
-}
 export type WinDirection = 'row-1' | 'row-2' | 'row-3' | 'col-1' | 'col-2' | 'col-3' | 'dia-1' | 'dia-2';
 export enum WinState {
   WINNABLE,
@@ -16,7 +10,6 @@ export enum WinState {
 }
 export interface PotentialWinData {
   currentState: BoardCell[];
-  player: Player | null;
   state: WinState;
   cellCount: number;
 }
@@ -26,23 +19,19 @@ export interface PotentialWins {
 
 let board: BoardState;
 let potentialWins: PotentialWins;
-let currentPlayer: Player | undefined;
-let winningPlayer: Player | undefined;
 
 const boardHandlers = new Set<BoardChangeHandler>();
-const playerHandlers = new Set<PlayerChangeHandler>();
-const winHandlers = new Set<PlayerChangeHandler>();
-const boardMap = new Map<number[], WinDirection[]>();
+const boardMap = new Map<String, WinDirection[]>();
 
-boardMap.set([0, 0], ['row-1', 'col-1', 'dia-1']);
-boardMap.set([0, 1], ['row-1', 'col-2']);
-boardMap.set([0, 2], ['row-1', 'col-3', 'dia-2']);
-boardMap.set([1, 0], ['row-2', 'col-1']);
-boardMap.set([1, 1], ['row-2', 'col-2', 'dia-1', 'dia-2']);
-boardMap.set([1, 2], ['row-2', 'col-3']);
-boardMap.set([2, 0], ['row-3', 'col-1', 'dia-2']);
-boardMap.set([2, 1], ['row-3', 'col-2']);
-boardMap.set([2, 2], ['row-3', 'col-3', 'dia-1']);
+boardMap.set('00', ['row-1', 'col-1', 'dia-1']);
+boardMap.set('01', ['row-1', 'col-2']);
+boardMap.set('02', ['row-1', 'col-3', 'dia-2']);
+boardMap.set('10', ['row-2', 'col-1']);
+boardMap.set('11', ['row-2', 'col-2', 'dia-1', 'dia-2']);
+boardMap.set('12', ['row-2', 'col-3']);
+boardMap.set('20', ['row-3', 'col-1', 'dia-2']);
+boardMap.set('21', ['row-3', 'col-2']);
+boardMap.set('22', ['row-3', 'col-3', 'dia-1']);
 
 export function getBoardState() {
   return [...board];
@@ -58,20 +47,8 @@ function emitBoardChangeEvent() {
   });
 }
 
-function emitPlayerChangeEvent() {
-  playerHandlers.forEach(handler => {
-    handler(currentPlayer);
-  });
-}
-
-function emitWinChangeEvent() {
-  winHandlers.forEach(handler => {
-    handler(currentPlayer);
-  });
-}
-
 function getVertices(row: number, col: number) {
-  const verticesToUpdate: WinDirection[] | undefined = boardMap.get([row, col]);
+  const verticesToUpdate: WinDirection[] | undefined = boardMap.get(`${row}${col}`);
   if (verticesToUpdate === undefined) {
     throw new Error('vertix is not defined')
   }
@@ -109,7 +86,7 @@ function getWinState(vertex: WinDirection) {
   return WinState.WINNABLE;
 }
 
-function updateCurrentState(row: number, col: number, value: BoardCell, vertex: WinDirection, player: Player) {
+function updateCurrentState(row: number, col: number, value: BoardCell, vertex: WinDirection) {
   const stateIndex = getStateIndex(row, col, vertex);
 
   if (potentialWins[vertex].currentState[stateIndex] !== null) {
@@ -118,11 +95,11 @@ function updateCurrentState(row: number, col: number, value: BoardCell, vertex: 
 
   potentialWins[vertex].currentState[stateIndex] = value;
   potentialWins[vertex].cellCount = getRowCount(vertex, null);
-  potentialWins[vertex].player = potentialWins[vertex].player = player;
   potentialWins[vertex].state = potentialWins[vertex].state = getWinState(vertex);
+  console.log(potentialWins);
 }
 
-export function setBoardState(row: number, col: number, value: BoardCell, player: Player) {
+export function setBoardState(row: number, col: number, value: BoardCell) {
   if (row < 0 || row > 2 || col < 0 || col > 2) {
     throw new Error(`row and col must be integers between 0 and 2, but I received row: ${row}, col: ${col}`);
   }
@@ -135,35 +112,16 @@ export function setBoardState(row: number, col: number, value: BoardCell, player
   // update potentialWins cache
   const verticesToUpdate = getVertices(row, col);
   verticesToUpdate.forEach((vertex: WinDirection) => {
-    updateCurrentState(row, col, value, vertex, player);
+    updateCurrentState(row, col, value, vertex);
   })
 
   emitBoardChangeEvent();
-}
-
-export function setCurrentPlayer(player: Player) {
-  currentPlayer = player;
-  emitPlayerChangeEvent();
-}
-
-export function getCurrentPlayer() {
-  return currentPlayer;
-}
-
-export function setWinningPlayer(player: Player) {
-  winningPlayer = player;
-  emitWinChangeEvent();
-}
-
-export function getWinningPlayer() {
-  return winningPlayer;
 }
 
 function getEmptyWinData(): PotentialWinData {
   return {
     state: WinState.WINNABLE,
     currentState: [],
-    player: null,
     cellCount: 0,
   }
 }
@@ -184,8 +142,6 @@ export function reset() {
     'dia-1': getEmptyWinData(),
     'dia-2': getEmptyWinData(),
   };
-  currentPlayer = undefined;
-  winningPlayer = undefined;
 }
 
 export function onBoardChange(onChange: BoardChangeHandler) {
@@ -193,14 +149,3 @@ export function onBoardChange(onChange: BoardChangeHandler) {
 
   onChange(board, potentialWins);
 }
-
-export function onPlayerChange(onChange: PlayerChangeHandler) {
-  playerHandlers.add(onChange);
-
-  onChange(currentPlayer);
-};
-export function onPlayerWon(onChange: PlayerChangeHandler) {
-  winHandlers.add(onChange);
-
-  onChange(winningPlayer);
-};
