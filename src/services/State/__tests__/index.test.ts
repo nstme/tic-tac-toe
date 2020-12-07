@@ -21,7 +21,7 @@ function setupBoard() {
   setBoardState(2, 2, 'o');
 }
 
-describe.only('the State service', () => {
+describe('the State service', () => {
   let board: BoardState | undefined;
   let potentialWins: PotentialWins | undefined;
 
@@ -59,7 +59,7 @@ describe.only('the State service', () => {
       potentialWins = getPotentialWinState();
     });
 
-    it.only('returns the potentialWins', () => {
+    it('returns the potentialWins', () => {
       expect(potentialWins).toEqual({
         'row-1': {
           currentState: ['x', null, 'o'],
