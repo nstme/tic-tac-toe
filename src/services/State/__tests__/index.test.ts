@@ -112,6 +112,7 @@ describe('the State service', () => {
       reset();
 
       board = getBoardState();
+      potentialWins = getPotentialWinState();
     });
 
     it('resets the board', () => {
@@ -121,6 +122,51 @@ describe('the State service', () => {
         [null, null, null],
       ])
     });
+
+    it('resets potentialWins', () => {
+      expect(potentialWins).toEqual({
+        'row-1': {
+          currentState: [null, null, null],
+          state: WinState.WINNABLE,
+          cellCount: 0,
+        },
+        'row-2': {
+          currentState: [null, null, null],
+          state: WinState.WINNABLE,
+          cellCount: 0,
+        },
+        'row-3': {
+          currentState: [null, null, null],
+          state: WinState.WINNABLE,
+          cellCount: 0,
+        },
+        'col-1': {
+          currentState: [null, null, null],
+          state: WinState.WINNABLE,
+          cellCount: 0,
+        },
+        'col-2': {
+          currentState: [null, null, null],
+          state: WinState.WINNABLE,
+          cellCount: 0,
+        },
+        'col-3': {
+          currentState: [null, null, null],
+          state: WinState.WINNABLE,
+          cellCount: 0,
+        },
+        'dia-1': {
+          currentState: [null, null, null],
+          state: WinState.WINNABLE,
+          cellCount: 0,
+        },
+        'dia-2': {
+          currentState: [null, null, null],
+          state: WinState.WINNABLE,
+          cellCount: 0,
+        },
+      });
+    })
   });
 
   describe('onBoardChange', () => {
@@ -147,7 +193,49 @@ describe('the State service', () => {
           ['x', null, null],
           [null, null, null],
           [null, null, null],
-        ])
+        ],
+        {
+          'row-1': {
+            currentState: ['x', null, null],
+            state: WinState.WINNABLE,
+            cellCount: 1,
+          },
+          'row-2': {
+            currentState: [null, null, null],
+            state: WinState.WINNABLE,
+            cellCount: 0,
+          },
+          'row-3': {
+            currentState: [null, null, null],
+            state: WinState.WINNABLE,
+            cellCount: 0,
+          },
+          'col-1': {
+            currentState: ['x', null, null],
+            state: WinState.WINNABLE,
+            cellCount: 1,
+          },
+          'col-2': {
+            currentState: [null, null, null],
+            state: WinState.WINNABLE,
+            cellCount: 0,
+          },
+          'col-3': {
+            currentState: [null, null, null],
+            state: WinState.WINNABLE,
+            cellCount: 0,
+          },
+          'dia-1': {
+            currentState: ['x', null, null],
+            state: WinState.WINNABLE,
+            cellCount: 1,
+          },
+          'dia-2': {
+            currentState: [null, null, null],
+            state: WinState.WINNABLE,
+            cellCount: 0,
+          },
+        })
       });
     });
 
@@ -173,7 +261,49 @@ describe('the State service', () => {
           ['x', null, null],
           [null, null, null],
           [null, null, null],
-        ])
+        ],
+        {
+          'row-1': {
+            currentState: ['x', null, null],
+            state: WinState.WINNABLE,
+            cellCount: 1,
+          },
+          'row-2': {
+            currentState: [null, null, null],
+            state: WinState.WINNABLE,
+            cellCount: 0,
+          },
+          'row-3': {
+            currentState: [null, null, null],
+            state: WinState.WINNABLE,
+            cellCount: 0,
+          },
+          'col-1': {
+            currentState: ['x', null, null],
+            state: WinState.WINNABLE,
+            cellCount: 1,
+          },
+          'col-2': {
+            currentState: [null, null, null],
+            state: WinState.WINNABLE,
+            cellCount: 0,
+          },
+          'col-3': {
+            currentState: [null, null, null],
+            state: WinState.WINNABLE,
+            cellCount: 0,
+          },
+          'dia-1': {
+            currentState: ['x', null, null],
+            state: WinState.WINNABLE,
+            cellCount: 1,
+          },
+          'dia-2': {
+            currentState: [null, null, null],
+            state: WinState.WINNABLE,
+            cellCount: 0,
+          },
+        })
       });
     });
   });

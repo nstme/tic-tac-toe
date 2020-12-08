@@ -67,14 +67,14 @@ function getStateIndex(row: number, col: number, vertex: WinDirection) {
   return col;
 }
 
-function getRowCount(vertex: WinDirection, value: BoardCell) {
+function getCellCount(vertex: WinDirection, value: BoardCell) {
   const res = potentialWins[vertex].currentState.filter(cellValue => cellValue === value);
   return res.length;
 }
 
 function getWinState(vertex: WinDirection) {
-  const xCount = getRowCount(vertex, 'x');
-  const oCount = getRowCount(vertex, 'o');
+  const xCount = getCellCount(vertex, 'x');
+  const oCount = getCellCount(vertex, 'o');
 
   if (xCount !== 0 && oCount !== 0) {
     return WinState.NOT_WINNABLE;
@@ -90,12 +90,12 @@ function getWinState(vertex: WinDirection) {
 function updateCurrentState(row: number, col: number, value: BoardCell, vertex: WinDirection) {
   const stateIndex = getStateIndex(row, col, vertex);
 
-  if (potentialWins[vertex].currentState[stateIndex] !== undefined) {
+  if (potentialWins[vertex].currentState[stateIndex] !== null) {
     throw new Error("Can't play the same cell twice!");
   }
 
   potentialWins[vertex].currentState[stateIndex] = value;
-  potentialWins[vertex].cellCount = 3 - getRowCount(vertex, null);
+  potentialWins[vertex].cellCount = 3 - getCellCount(vertex, null);
   potentialWins[vertex].state = potentialWins[vertex].state = getWinState(vertex);
 }
 
@@ -121,7 +121,7 @@ export function setBoardState(row: number, col: number, value: BoardCell) {
 function getEmptyWinData(): PotentialWinData {
   return {
     state: WinState.WINNABLE,
-    currentState: [],
+    currentState: [null, null, null],
     cellCount: 0,
   }
 }
