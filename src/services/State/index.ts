@@ -16,6 +16,11 @@ export interface PotentialWinData {
 export interface PotentialWins {
   [key: string]: PotentialWinData;
 }
+export enum Player {
+  PLAYER_1,
+  PLAYER_2,
+}
+export type PlayerSetter = (player: Player) => void;
 
 let board: BoardState;
 let potentialWins: PotentialWins;
