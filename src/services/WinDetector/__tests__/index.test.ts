@@ -1,51 +1,6 @@
 import { random } from 'faker';
 import winDetectorFactory from '../';
-import { WinState, BoardState, PotentialWins, } from '../../State';
-
-function getWinningBoard(): BoardState {
-  const boards: BoardState[] = [
-    [
-      ['x', 'x', 'x'],
-      ['o', 'x', 'o'],
-      [null, 'o', 'o'],
-    ],
-    [
-      [null, 'x', 'x'],
-      ['o', 'o', 'o'],
-      [null, 'x', 'o'],
-    ],
-    [
-      [null, 'x', 'o'],
-      ['o', 'o', 'o'],
-      [null, 'x', 'o'],
-    ],
-    [
-      [null, 'x', 'o'],
-      ['o', 'x', 'x'],
-      [null, 'x', 'o'],
-    ],
-    [
-      [null, 'x', 'x'],
-      ['o', 'x', 'x'],
-      ['x', 'x', 'o'],
-    ],
-    [
-      ['o', 'x', 'x'],
-      ['o', 'o', 'x'],
-      ['x', 'x', 'o'],
-    ],
-  ];
-
-  return random.arrayElement<BoardState>(boards);
-}
-
-function getLosingBoard(): BoardState {
-  return [
-    ['x', 'o', 'x'],
-    [null, 'o', 'o'],
-    [null, null, null],
-  ]
-}
+import { WinState, BoardState, PotentialWins, BoardChangeHandler, Player, } from '../../State';
 
 function getWinningState(): PotentialWins {
   const winningStates: PotentialWins[] = [
@@ -268,14 +223,22 @@ function getLosingState(): PotentialWins {
 }
 
 describe('WinDetector', () => {
-  const setWinningPlayer = jest.fn();
-  const winDetector = winDetectorFactory(setWinningPlayer);
+  let setWinningPlayer: jest.Mock;
+  let winDetector: BoardChangeHandler;
+  const board:BoardState = [
+    [null, 'x', 'x'],
+    ['o', 'x', 'x'],
+    ['x', 'x', 'o'],
+  ];
+
+  beforeEach(() => {
+    setWinningPlayer = jest.fn();
+    winDetector = winDetectorFactory(setWinningPlayer);
+  });
 
   describe('a losing board state', () => {
     beforeEach(() => {
-      const board = getLosingBoard();
       const potentialWinState = getLosingState();
-
       winDetector(board, potentialWinState);
     });
 
@@ -285,15 +248,25 @@ describe('WinDetector', () => {
   });
 
   describe('a winning board state', () => {
-    beforeEach(() => {
-      const board = getWinningBoard();
-      const potentialWinState = getWinningState();
+    let winningPlayer: Player;
 
+    beforeEach(() => {
+      const potentialWinState = getWinningState();
+      const winningVertex = Object.keys(potentialWinState).find((vertex) => 
+        potentialWinState[vertex].state === WinState.WON
+      );
+      const winningSymbol = potentialWinState[winningVertex!].currentState[0];
+      winningPlayer = (winningSymbol === 'x') ? Player.PLAYER_1 : Player.PLAYER_2;
+      
       winDetector(board, potentialWinState);
     });
 
-    it('it updates the winning player', () => {
+    it('it calls setWinningPlayer', () => {
       expect(setWinningPlayer).toBeCalledTimes(1);
+    });
+
+    it('it updates the winning player', () => {
+      expect(setWinningPlayer).toHaveBeenCalledWith(winningPlayer);
     });
   });
 });
