@@ -1,8 +1,19 @@
 export type BoardCell = 'x' | 'o' | null;
 export type BoardRow = BoardCell[];
 export type BoardState = BoardRow[];
-export type BoardChangeHandler = (board: BoardState, winState: PotentialWins) => void;
-export type WinDirection = 'row-1' | 'row-2' | 'row-3' | 'col-1' | 'col-2' | 'col-3' | 'dia-1' | 'dia-2';
+export type BoardChangeHandler = (
+  board: BoardState,
+  winState: PotentialWins,
+) => void;
+export type WinDirection =
+  | 'row-1'
+  | 'row-2'
+  | 'row-3'
+  | 'col-1'
+  | 'col-2'
+  | 'col-3'
+  | 'dia-1'
+  | 'dia-2';
 export enum WinState {
   WINNABLE,
   NOT_WINNABLE,
@@ -26,7 +37,7 @@ let board: BoardState;
 let potentialWins: PotentialWins;
 
 const boardHandlers = new Set<BoardChangeHandler>();
-const boardMap = new Map<String, WinDirection[]>();
+const boardMap = new Map<string, WinDirection[]>();
 
 boardMap.set('00', ['row-1', 'col-1', 'dia-1']);
 boardMap.set('01', ['row-1', 'col-2']);
@@ -47,15 +58,17 @@ export function getPotentialWinState() {
 }
 
 function emitBoardChangeEvent() {
-  boardHandlers.forEach(handler => {
+  boardHandlers.forEach((handler) => {
     handler([...board], { ...potentialWins });
   });
 }
 
 function getVertices(row: number, col: number) {
-  const verticesToUpdate: WinDirection[] | undefined = boardMap.get(`${row}${col}`);
+  const verticesToUpdate: WinDirection[] | undefined = boardMap.get(
+    `${row}${col}`,
+  );
   if (verticesToUpdate === undefined) {
-    throw new Error('vertix is not defined')
+    throw new Error('vertix is not defined');
   }
 
   return verticesToUpdate;
@@ -73,7 +86,9 @@ function getStateIndex(row: number, col: number, vertex: WinDirection) {
 }
 
 function getCellCount(vertex: WinDirection, value: BoardCell) {
-  const res = potentialWins[vertex].currentState.filter(cellValue => cellValue === value);
+  const res = potentialWins[vertex].currentState.filter(
+    (cellValue) => cellValue === value,
+  );
   return res.length;
 }
 
@@ -92,7 +107,12 @@ function getWinState(vertex: WinDirection) {
   return WinState.WINNABLE;
 }
 
-function updateCurrentState(row: number, col: number, value: BoardCell, vertex: WinDirection) {
+function updateCurrentState(
+  row: number,
+  col: number,
+  value: BoardCell,
+  vertex: WinDirection,
+) {
   const stateIndex = getStateIndex(row, col, vertex);
 
   if (potentialWins[vertex].currentState[stateIndex] !== null) {
@@ -101,16 +121,22 @@ function updateCurrentState(row: number, col: number, value: BoardCell, vertex: 
 
   potentialWins[vertex].currentState[stateIndex] = value;
   potentialWins[vertex].cellCount = 3 - getCellCount(vertex, null);
-  potentialWins[vertex].state = potentialWins[vertex].state = getWinState(vertex);
+  potentialWins[vertex].state = potentialWins[vertex].state = getWinState(
+    vertex,
+  );
 }
 
 export function setBoardState(row: number, col: number, value: BoardCell) {
   if (row < 0 || row > 2 || col < 0 || col > 2) {
-    throw new Error(`row and col must be integers between 0 and 2, but I received row: ${row}, col: ${col}`);
+    throw new Error(
+      `row and col must be integers between 0 and 2, but I received row: ${row}, col: ${col}`,
+    );
   }
 
   if (value !== 'x' && value !== 'o' && value !== null) {
-    throw new Error(`value must be one of "x, o, null" but I received ${value}`);
+    throw new Error(
+      `value must be one of "x, o, null" but I received ${value}`,
+    );
   }
 
   board[row][col] = value;
@@ -118,7 +144,7 @@ export function setBoardState(row: number, col: number, value: BoardCell) {
   const verticesToUpdate = getVertices(row, col);
   verticesToUpdate.forEach((vertex: WinDirection) => {
     updateCurrentState(row, col, value, vertex);
-  })
+  });
 
   emitBoardChangeEvent();
 }
@@ -128,7 +154,7 @@ function getEmptyWinData(): PotentialWinData {
     state: WinState.WINNABLE,
     currentState: [null, null, null],
     cellCount: 0,
-  }
+  };
 }
 
 export function reset() {

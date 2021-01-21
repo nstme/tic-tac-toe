@@ -2,103 +2,283 @@ import {
   BoardState,
   reset,
   getBoardState,
+  PotentialWins,
+  WinState,
+  getPotentialWinState,
 } from '../../State';
 import makeAiMove from '../';
 
 describe('makeAiMove', () => {
-  let board: BoardState | undefined;
-  let newBoardState: BoardState;
+  let boardState: PotentialWins | undefined;
+  let newBoardState: PotentialWins;
 
   afterEach(() => {
     reset();
-    board = undefined;
+    boardState = undefined;
   });
 
   describe('when there is a winning move for AI Player_2', () => {
     beforeEach(() => {
-      board = [
-        ['o', null, 'o'],
-        [null, 'x', null],
-        [null, null, 'x'],
-      ];
-      makeAiMove(board);
-      newBoardState = getBoardState();
+      boardState = {
+            'row-1': {
+              currentState: ['o', null, 'o'],
+              state: WinState.WINNABLE,
+              cellCount: 2,
+            },
+            'row-2': {
+              currentState: [null, 'x', null],
+              state: WinState.WINNABLE,
+              cellCount: 1,
+            },
+            'row-3': {
+              currentState: [null, null, 'x'],
+              state: WinState.WINNABLE,
+              cellCount: 1,
+            },
+            'col-1': {
+              currentState: ['o', null, null],
+              state: WinState.WINNABLE,
+              cellCount: 1,
+            },
+            'col-2': {
+              currentState: [null, 'x', null],
+              state: WinState.WINNABLE,
+              cellCount: 1,
+            },
+            'col-3': {
+              currentState: ['o', null, 'x'],
+              state: WinState.NOT_WINNABLE,
+              cellCount: 2,
+            },
+            'dia-1': {
+              currentState: ['o', 'x', 'x'],
+              state: WinState.NOT_WINNABLE,
+              cellCount: 3,
+            },
+            'dia-2': {
+              currentState: [null, 'x', 'o'],
+              state: WinState.NOT_WINNABLE,
+              cellCount: 2,
+            },
+          },
+      makeAiMove(boardState);
+      newBoardState = getPotentialWinState();
     });
 
     it('AI Player_2 makes a winning move', () => {
-      expect(newBoardState).toEqual([
-        ['o', 'o', 'o'],
-        [null, 'x', null],
-        [null, null, 'x'],
-      ])
-    })
+      expect(newBoardState['row1'].currentState).toEqual(['o', 'o', 'o']);
+    });
   });
 
   describe('when there is a winning move for human Player_1', () => {
     beforeEach(() => {
-      board = [
-        ['o', null, 'x'],
-        [null, 'x', null],
-        [null, null, 'o'],
-      ];
-      makeAiMove(board);
-      newBoardState = getBoardState();
+        boardState = {
+        'row-1': {
+          currentState: ['o', null, 'x'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 2,
+        },
+        'row-2': {
+          currentState: [null, 'x', null],
+          state: WinState.WINNABLE,
+          cellCount: 1,
+        },
+        'row-3': {
+          currentState: [null, null, 'o'],
+          state: WinState.WINNABLE,
+          cellCount: 1,
+        },
+        'col-1': {
+          currentState: ['o', null, null],
+          state: WinState.WINNABLE,
+          cellCount: 1,
+        },
+        'col-2': {
+          currentState: [null, 'x', null],
+          state: WinState.WINNABLE,
+          cellCount: 1,
+        },
+        'col-3': {
+          currentState: ['x', null, 'o'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 2,
+        },
+        'dia-1': {
+          currentState: ['o', 'x', 'o'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 3,
+        },
+        'dia-2': {
+          currentState: [null, 'x', 'x'],
+          state: WinState.WINNABLE,
+          cellCount: 2,
+        },
+      },
+      makeAiMove(boardState);
+      newBoardState = getPotentialWinState();
     });
 
     it('blocks Player_1 winning move', () => {
-      expect(newBoardState).toEqual([
-        ['o', null, 'x'],
-        [null, 'x', null],
-        ['o', null, 'o'],
-      ])
-    })
+      expect(newBoardState['dia2'].currentState).toEqual(['o', 'x', 'x']);
+    });
   });
 
   describe('when the central cell is empty', () => {
     beforeEach(() => {
-      board = [
-        ['x', null, null],
-        [null, null, null], 
-        [null, null, null],
-      ];
-      makeAiMove(board);
-      newBoardState = getBoardState();
+      boardState = {
+        'row-1': {
+          currentState: ['x', null, null],
+          state: WinState.WINNABLE,
+          cellCount: 1,
+        },
+        'row-2': {
+          currentState: [null, null, null],
+          state: WinState.WINNABLE,
+          cellCount: 0,
+        },
+        'row-3': {
+          currentState: [null, null, null],
+          state: WinState.WINNABLE,
+          cellCount: 0,
+        },
+        'col-1': {
+          currentState: ['x', null, null],
+          state: WinState.WINNABLE,
+          cellCount: 1,
+        },
+        'col-2': {
+          currentState: [null, null, null],
+          state: WinState.WINNABLE,
+          cellCount: 0,
+        },
+        'col-3': {
+          currentState: [null, null, null],
+          state: WinState.WINNABLE,
+          cellCount: 0,
+        },
+        'dia-1': {
+          currentState: ['x', null, null],
+          state: WinState.WINNABLE,
+          cellCount: 1,
+        },
+        'dia-2': {
+          currentState: [null, null, null],
+          state: WinState.WINNABLE,
+          cellCount: 0,
+        },
+      },
+      makeAiMove(boardState);
+      newBoardState = getPotentialWinState();
     });
 
     it('makes a move to the central cell', () => {
-      expect(newBoardState).toEqual([
-        ['x', null, null],
-        [null, 'o', null],
-        [null, null, null],
-      ])
-    })
+      expect(newBoardState['row2'].currentState).toEqual([null, 'o', null]);
+    });
   });
 
   describe('when the center cell is taken, but there is empty corner cell', () => {
     beforeEach(() => {
-      board = [
-        [null, null, null],
-        [null, 'x', null],
-        [null, null, null],
-      ];
-      makeAiMove(board);
-      newBoardState = getBoardState();
+      boardState = {
+        'row-1': {
+          currentState: [null, null, null],
+          state: WinState.WINNABLE,
+          cellCount: 0,
+        },
+        'row-2': {
+          currentState: [null, 'x', null],
+          state: WinState.WINNABLE,
+          cellCount: 1,
+        },
+        'row-3': {
+          currentState: [null, null, null],
+          state: WinState.WINNABLE,
+          cellCount: 0,
+        },
+        'col-1': {
+          currentState: [null, null, null],
+          state: WinState.WINNABLE,
+          cellCount: 0,
+        },
+        'col-2': {
+          currentState: [null, 'x', null],
+          state: WinState.WINNABLE,
+          cellCount: 1,
+        },
+        'col-3': {
+          currentState: [null, null, null],
+          state: WinState.WINNABLE,
+          cellCount: 0,
+        },
+        'dia-1': {
+          currentState: [null, 'x', null],
+          state: WinState.WINNABLE,
+          cellCount: 1,
+        },
+        'dia-2': {
+          currentState: [null, 'x', null],
+          state: WinState.WINNABLE,
+          cellCount: 1,
+        },
+      },
+      makeAiMove(boardState);
+      newBoardState = getPotentialWinState();
     });
 
-    it.todo('makes a move to the random corner cell', );
+    it('makes a move to the first available corner cell', () => {
+      expect(newBoardState['row1'].currentState).toEqual(['o', null, null]);
+    });
   });
 
-  describe('when the center & corner cells are taken, but there is empty edge cell', () => {
+  describe('when the center & corner cells are taken, and there are no winning moves', () => {
     beforeEach(() => {
-      board = [
-        ['x', null, 'o'],
-        ['o', 'o', 'x'],
-        ['x', null, 'x'],
-      ];
-      makeAiMove(board);
-      newBoardState = getBoardState();
+      boardState = {
+        'row-1': {
+          currentState: ['x', 'o', 'x'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 3,
+        },
+        'row-2': {
+          currentState: ['o', 'x', null],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 2,
+        },
+        'row-3': {
+          currentState: ['o', 'x', 'o'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 3,
+        },
+        'col-1': {
+          currentState: ['x', 'o', 'o'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 3,
+        },
+        'col-2': {
+          currentState: ['o', 'x', 'x'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 3,
+        },
+        'col-3': {
+          currentState: ['x', null, 'o'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 2,
+        },
+        'dia-1': {
+          currentState: ['x', 'x', 'o'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 3,
+        },
+        'dia-2': {
+          currentState: ['o', 'x', 'x'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 3,
+        },
+      },
+      makeAiMove(boardState);
+      newBoardState = getPotentialWinState();
     });
 
-    it.todo('makes a move to the random edge cell', );
+    it('makes a move to the first available edge cell', () => {
+      expect(newBoardState['row2'].currentState).toEqual(['o', 'x', 'o']);
+    });
   });
-})
+});

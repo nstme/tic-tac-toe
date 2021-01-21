@@ -1,7 +1,18 @@
-import { BoardChangeHandler, BoardState, Player, PlayerSetter, BoardCell, PotentialWins, WinState } from "../State";
+import {
+  BoardChangeHandler,
+  BoardState,
+  Player,
+  PlayerSetter,
+  BoardCell,
+  PotentialWins,
+  WinState,
+} from '../State';
 
 export default function winDetectorFactory(setWinningPlayer: PlayerSetter) {
-  const winDetector: BoardChangeHandler = (_board: BoardState, winState: PotentialWins) => {
+  const winDetector: BoardChangeHandler = (
+    _board: BoardState,
+    winState: PotentialWins,
+  ) => {
     // examine board state for a win
     // -- if there's a win, call setWinningPlayer(currentPlayer)
     // -- else, do nothing
@@ -13,8 +24,8 @@ export default function winDetectorFactory(setWinningPlayer: PlayerSetter) {
           setWinningPlayer(Player.PLAYER_1);
         }
         if (winningCell === 'o') {
-          setWinningPlayer(Player.PLAYER_2)
-        };
+          setWinningPlayer(Player.PLAYER_2);
+        }
       }
     }
   };

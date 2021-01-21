@@ -1,6 +1,12 @@
 import { random } from 'faker';
 import winDetectorFactory from '../';
-import { WinState, BoardState, PotentialWins, BoardChangeHandler, Player, } from '../../State';
+import {
+  WinState,
+  BoardState,
+  PotentialWins,
+  BoardChangeHandler,
+  Player,
+} from '../../State';
 
 function getWinningState(): PotentialWins {
   const winningStates: PotentialWins[] = [
@@ -172,7 +178,7 @@ function getWinningState(): PotentialWins {
         cellCount: 3,
       },
     },
-  ]
+  ];
 
   return random.arrayElement<PotentialWins>(winningStates);
 }
@@ -219,13 +225,13 @@ function getLosingState(): PotentialWins {
       state: WinState.NOT_WINNABLE,
       cellCount: 2,
     },
-  }
+  };
 }
 
 describe('WinDetector', () => {
   let setWinningPlayer: jest.Mock;
   let winDetector: BoardChangeHandler;
-  const board:BoardState = [
+  const board: BoardState = [
     [null, 'x', 'x'],
     ['o', 'x', 'x'],
     ['x', 'x', 'o'],
@@ -252,12 +258,12 @@ describe('WinDetector', () => {
 
     beforeEach(() => {
       const potentialWinState = getWinningState();
-      const winningVertex = Object.keys(potentialWinState).find((vertex) => 
-        potentialWinState[vertex].state === WinState.WON
+      const winningVertex = Object.keys(potentialWinState).find(
+        (vertex) => potentialWinState[vertex].state === WinState.WON,
       );
       const winningSymbol = potentialWinState[winningVertex!].currentState[0];
-      winningPlayer = (winningSymbol === 'x') ? Player.PLAYER_1 : Player.PLAYER_2;
-      
+      winningPlayer = winningSymbol === 'x' ? Player.PLAYER_1 : Player.PLAYER_2;
+
       winDetector(board, potentialWinState);
     });
 

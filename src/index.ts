@@ -2,10 +2,10 @@ export default async function main() {
   return 'hello world';
 }
 
-new Promise ( async () => {
+new Promise(async () => {
   try {
-    await main()
+    await main();
   } catch (err) {
     console.log(err);
   }
-})
+});
