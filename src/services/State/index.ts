@@ -37,7 +37,7 @@ let board: BoardState;
 let potentialWins: PotentialWins;
 
 const boardHandlers = new Set<BoardChangeHandler>();
-const boardMap = new Map<string, WinDirection[]>();
+export const boardMap = new Map<string, WinDirection[]>();
 
 boardMap.set('00', ['row-1', 'col-1', 'dia-1']);
 boardMap.set('01', ['row-1', 'col-2']);

@@ -1,37 +1,83 @@
 import {
-  PotentialWins, Player, BoardMap,
+  PotentialWins,
+  boardMap,
+  WinState,
+  PotentialWinData,
+  setBoardState,
 } from '../State';
 
-// filter state obj for winnable vertices 
-  
-  // get winnableVertices for Player2 -- 'o' with cellCount > 0 
-  // get vertex with highest cellCount - priorityVertex, and make a move() there:
-    //get empty cell's row,col in priorityVertex;
-    //get cellVertices array for this row,col using BoardMap and
-    //cellVertices.forEach( vertex, () => updateCurrentState(row, col,'o', vertex))
-  //return
+const cellsWeight = new Map<string, number>();
+let priorityIndex: string;
 
-  // get winnable vertices for Player1 -- 'x' with cellCount > 0
-    // if found, make aiMove() to block (same logic as above)\
-    //return
+// function sortCellsWeight(cellsWeight:any) {
+//   return new Map([...cellsWeight.entries()].sort((a, b) => b[1] - a[1]));
+// }
 
-  //if center cell [1,1] is empty
-    //make a move to center cell by updating currentState:
-      //get cellVertices for given cell row,col using BoardMap
-      //call updateCurrentState(1,1,'o',vertex) for each vertex
-    // return
+function getCellsWeight() {
+  let weight: number;
+  for (const [cellIndex, vertices] of boardMap) {
+    weight = vertices.length;
+    cellsWeight.set(cellIndex.toString(), weight);
+  };
+  return cellsWeight;
+}
 
-  //if any of corner cells [0, 0], [0, 2], [2, 0], [2, 2] is empty
-    //make a move to the first empty cell by updating currentState:
-      //get cellVertices for given cell row,col using BoardMap
-      //call updateCurrentState(1,1,'o',vertex) for each vertex
-  //return
+function getPriorityIndex(vertex:string, vertexData:PotentialWinData) {
+  const nullIndex = vertexData.currentState.indexOf(null);
+  const [dir, dirNumber] = vertex.split('-');
+  let index:number = parseInt(dirNumber) - 1;
 
-  // same for border cells [0,1], [1, 0], [1, 2], [2, 1]
+  if (dir === 'row') {
+    return `${index}${nullIndex}`
+  }
+  return `${nullIndex}${index}`
+}
 
-  //in case there are no WinState.WINNABLE states i.e. hasWinState(boardState) === false
-    // filter out vertices with cellCounts === 3 and
-    // make a move to the empty cell of the first vertex
+function getWinnableVertices(boardState:PotentialWins) {
+  let winnableVertices:PotentialWins = {};
 
+  for (const [vertex, vertexData] of Object.entries(boardState)) {
+    if (vertexData.state === WinState.WINNABLE) {
+      winnableVertices[vertex] = vertexData;
+    };
+  }
+  return winnableVertices;
+}
 
-export default function makeAiMove(boardState: PotentialWins) {}
+function updateCellsWeight(winnableVertices:PotentialWins) {
+  for (const [vertex, vertexData] of Object.entries(winnableVertices)) {
+    if (vertexData.cellCount === 2 && vertexData.currentState.includes('o')) {
+      priorityIndex = getPriorityIndex(vertex, vertexData);
+      cellsWeight.set(priorityIndex, 10);
+    }
+    if (vertexData.cellCount === 2 && vertexData.currentState.includes('x')) {
+      priorityIndex = getPriorityIndex(vertex, vertexData);
+      cellsWeight.set(priorityIndex, 7);
+    }
+  }
+  return;
+}
+
+function getKeyByValue(object:any, value:any) {
+  return Object.keys(object).find(key => object[key] === value);
+}
+
+export default function makeAiMove(boardState: PotentialWins) {
+  const winnableVertices = getWinnableVertices(boardState);
+  if (Object.keys(winnableVertices).length === 0) {
+    return console.log('Draw');
+  };
+
+  const cellsWeight = getCellsWeight();
+  updateCellsWeight(winnableVertices);
+
+  const maxWeight = Math.max(...cellsWeight.values());
+  console.log(maxWeight, "&&&&");
+
+  const highestCellWeightIndex = getKeyByValue(cellsWeight, maxWeight);
+
+  console.log(highestCellWeightIndex, "@@@@@@@");
+  // const [row, col] = highestCellWeightIndex;
+  // setBoardState(parseInt(row), parseInt(col), 'o');
+  setBoardState(1, 1, 'o');
+}
