@@ -120,6 +120,7 @@ describe('makeAiMove', () => {
     });
 
     it('blocks Player_1 winning move', () => {
+      console.log('blocks human player')
       expect(newBoardState['dia2'].currentState).toEqual(['o', 'x', 'x']);
     });
   });
