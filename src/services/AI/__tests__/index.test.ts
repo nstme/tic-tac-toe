@@ -66,6 +66,7 @@ describe('makeAiMove', () => {
     });
 
     it('AI Player_2 makes a winning move', () => {
+      console.log(newBoardState, "!!!!!!!!!!!!!!");
       expect(newBoardState['row1'].currentState).toEqual(['o', 'o', 'o']);
     });
   });

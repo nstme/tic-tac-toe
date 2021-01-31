@@ -4,23 +4,41 @@ import {
   WinState,
   PotentialWinData,
   setBoardState,
+  WinDirection,
 } from '../State';
 
-const cellsWeight = new Map<string, number>();
-let priorityIndex: string;
-
-// function sortCellsWeight(cellsWeight:any) {
-//   return new Map([...cellsWeight.entries()].sort((a, b) => b[1] - a[1]));
-// }
-
-function getCellsWeight() {
-  let weight: number;
-  for (const [cellIndex, vertices] of boardMap) {
-    weight = vertices.length;
-    cellsWeight.set(cellIndex.toString(), weight);
-  };
-  return cellsWeight;
+interface boardMapObject { cellIndex: string, vertices: WinDirection[] };
+interface decoratedBoardMapObject extends boardMapObject {
+  weight: number;
 }
+
+function getBoardMapObject() {
+  const boardMapObject: boardMapObject[] = [];
+  for (const [cellIndex, vertices] of boardMap) {
+    boardMapObject.push({cellIndex, vertices})
+  };
+  return boardMapObject;
+}
+
+function getDecoratedBoardMapObjects(boardMapObjs: boardMapObject[], winnableVertices:PotentialWins):decoratedBoardMapObject[] {
+  const [modifier, modifierIndex] = getModifier(winnableVertices);
+  const reducer = (acc: decoratedBoardMapObject[], obj:boardMapObject) => {
+    return [...acc, {
+      ...obj,
+      weight: obj.vertices.length,
+    }
+    ]
+  };
+
+  const reduced = boardMapObjs.reduce<decoratedBoardMapObject[]>(reducer, []);
+  for (const object of reduced) {
+    if (object.cellIndex === modifierIndex) {
+      object.weight += modifier;
+    }
+  }
+  return reduced;
+}
+
 
 function getPriorityIndex(vertex: string, vertexData: PotentialWinData) {
   const nullIndex = vertexData.currentState.indexOf(null);
@@ -44,22 +62,12 @@ function getWinnableVertices(boardState: PotentialWins) {
   return winnableVertices;
 }
 
-function updateCellsWeight(winnableVertices: PotentialWins) {
+function getModifier(winnableVertices: PotentialWins):[number, string] {
   for (const [vertex, vertexData] of Object.entries(winnableVertices)) {
-    if (vertexData.cellCount === 2 && vertexData.currentState.includes('o')) {
-      priorityIndex = getPriorityIndex(vertex, vertexData);
-      cellsWeight.set(priorityIndex, 10);
-    }
-    if (vertexData.cellCount === 2 && vertexData.currentState.includes('x')) {
-      priorityIndex = getPriorityIndex(vertex, vertexData);
-      cellsWeight.set(priorityIndex, 7);
-    }
-  }
-  return;
-}
-
-function getKeyByValue(object: any, value: any) {
-  return Object.keys(object).find(key => object[key] === value);
+    const priorityIndex = getPriorityIndex(vertex, vertexData);
+    return (vertexData.cellCount === 2 && vertexData.currentState.includes('o')) ? [4, priorityIndex] : [0, '']
+  };
+  return [0, ''];
 }
 
 export default function makeAiMove(boardState: PotentialWins) {
@@ -68,73 +76,13 @@ export default function makeAiMove(boardState: PotentialWins) {
     return console.log('Draw');
   };
 
-  const cellsWeight = getCellsWeight();
-  updateCellsWeight(winnableVertices);
+  const boardMapObject = getBoardMapObject();
+  const decoratedBoardMapObjects = getDecoratedBoardMapObjects(boardMapObject, winnableVertices);
+  const sortedDecoratedBoardMapObjects = decoratedBoardMapObjects.sort((a, b) => b.weight - a.weight);
+  const highestCellWeightIndex = sortedDecoratedBoardMapObjects[0].cellIndex;
+  const [row, col] = highestCellWeightIndex;
+  // console.log(sortedDecoratedBoardMapObjects);
+  // console.log(row, col, "row, col ****");
 
-  const maxWeight = Math.max(...cellsWeight.values());
-  console.log(maxWeight, "&&&&");
-
-  const highestCellWeightIndex = getKeyByValue(cellsWeight, maxWeight);
-
-  console.log(highestCellWeightIndex, "@@@@@@@");
-  // const [row, col] = highestCellWeightIndex;
-  // setBoardState(parseInt(row), parseInt(col), 'o');
-  setBoardState(1, 1, 'o');
+  setBoardState(parseInt(row), parseInt(col), 'o');
 }
-
-const arr: number[] = [1, 4, 2, 7];
-const sorted = arr.sort();
-// => 1, 2, 4, 7
-
-interface AgeObject { name: string, age: number };
-interface DecoratedAgeObject extends AgeObject {
-  weight: number;
-}
-
-// 0x1234567
-const objectArr: AgeObject[] = [{
-  name: 'Sally',
-  age: 2,
-}, {
-  name: 'Frank',
-  age: 22
-}];
-
-function weightObjects(objs: AgeObject[], modifier = 2): DecoratedAgeObject[] {
-  const reducer = (acc: DecoratedAgeObject[], obj: AgeObject) => {
-    return [...acc, {
-      ...obj,
-      weight: obj.age + modifier
-    }];
-  }
-
-  return objs.reduce<DecoratedAgeObject[]>(reducer, []);
-}
-
-function sum(a: number, b: number): number {
-  a = 4;
-
-  return a + b;
-}
-
-
-const n = 1;
-const m = 2;
-const sum = sum(n, m);
-console.log(n); // => 1
-
-weightObjects(objectArr);
-console.log(objectArr[1].age); // => 33
-
-// (a: any, b: any) => 1, -1, 0
-const sortedObjects = objectArr.sort((a, b) => {
-  if (a.age > b.age) {
-    return 1;
-  }
-
-  if (b.age > a.age) {
-    return -1;
-  }
-
-  return 0;
-});
