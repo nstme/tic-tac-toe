@@ -54,10 +54,10 @@ function getPriorityIndex(vertex: string, vertexData: PotentialWinData) {
   return `${index}${nullIndex}`
 }
 
-function getWinnableVertices(boardState: PotentialWins) {
+function getWinnableVertices(potentialWins: PotentialWins) {
   let winnableVertices: PotentialWins = {};
 
-  for (const [vertex, vertexData] of Object.entries(boardState)) {
+  for (const [vertex, vertexData] of Object.entries(potentialWins)) {
     if (vertexData.state === WinState.WINNABLE) {
       winnableVertices[vertex] = vertexData;
     };
@@ -75,8 +75,8 @@ function getModifier(winnableVertices: PotentialWins):[number, string] {
   return [0, ''];
 }
 
-export default function makeAiMove(boardState: PotentialWins) {
-  const winnableVertices = getWinnableVertices(boardState);
+export default function makeAiMove(potentialWins: PotentialWins) {
+  const winnableVertices = getWinnableVertices(potentialWins);
   if (Object.keys(winnableVertices).length === 0) {
     return console.log('Draw');
   };
@@ -86,8 +86,5 @@ export default function makeAiMove(boardState: PotentialWins) {
   const sortedDecoratedBoardMapObjects = decoratedBoardMapObjects.sort((a, b) => b.weight - a.weight);
   const highestCellWeightIndex = sortedDecoratedBoardMapObjects[0].cellIndex;
   const [row, col] = highestCellWeightIndex;
-  console.log(sortedDecoratedBoardMapObjects);
-  console.log(row, col, "row, col ****");
-
   setBoardState(parseInt(row), parseInt(col), 'o');
 }
