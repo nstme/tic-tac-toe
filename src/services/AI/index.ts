@@ -3,8 +3,11 @@ import {
   boardMap,
   WinState,
   PotentialWinData,
-  setBoardState,
+  BoardState,
+  // setBoardState,
   WinDirection,
+  BoardChangeHandler,
+  BoardSetter,
 } from '../State';
 
 interface boardMapObject { cellIndex: string, vertices: WinDirection[] };
@@ -75,16 +78,39 @@ function getModifier(winnableVertices: PotentialWins):[number, string] {
   return [0, ''];
 }
 
-export default function makeAiMove(potentialWins: PotentialWins) {
-  const winnableVertices = getWinnableVertices(potentialWins);
-  if (Object.keys(winnableVertices).length === 0) {
-    return console.log('Draw');
-  };
+// export default function makeAiMove(potentialWins: PotentialWins) {
+//   const winnableVertices = getWinnableVertices(potentialWins);
+//   if (Object.keys(winnableVertices).length === 0) {
+//     return console.log('Draw');
+//   };
 
-  const boardMapObject = getBoardMapObject();
-  const decoratedBoardMapObjects = getDecoratedBoardMapObjects(boardMapObject, winnableVertices);
-  const sortedDecoratedBoardMapObjects = decoratedBoardMapObjects.sort((a, b) => b.weight - a.weight);
-  const highestCellWeightIndex = sortedDecoratedBoardMapObjects[0].cellIndex;
-  const [row, col] = highestCellWeightIndex;
-  setBoardState(parseInt(row), parseInt(col), 'o');
+//   const boardMapObject = getBoardMapObject();
+//   const decoratedBoardMapObjects = getDecoratedBoardMapObjects(boardMapObject, winnableVertices);
+//   const sortedDecoratedBoardMapObjects = decoratedBoardMapObjects.sort((a, b) => b.weight - a.weight);
+//   const highestCellWeightIndex = sortedDecoratedBoardMapObjects[0].cellIndex;
+//   const [row, col] = highestCellWeightIndex;
+  
+//   setBoardState(parseInt(row), parseInt(col), 'o');
+// }
+
+export default function aiFactory(setBoardState: BoardSetter) {
+  const makeAiMove: BoardChangeHandler = (
+    _board: BoardState,
+    potentialWins: PotentialWins,
+  ) => {
+    const winnableVertices = getWinnableVertices(potentialWins);
+    if (Object.keys(winnableVertices).length === 0) {
+      return console.log('Draw');
+    };
+
+    const boardMapObject = getBoardMapObject();
+    const decoratedBoardMapObjects = getDecoratedBoardMapObjects(boardMapObject, winnableVertices);
+    const sortedDecoratedBoardMapObjects = decoratedBoardMapObjects.sort((a, b) => b.weight - a.weight);
+    const highestCellWeightIndex = sortedDecoratedBoardMapObjects[0].cellIndex;
+    const [row, col] = highestCellWeightIndex;
+
+    setBoardState(parseInt(row), parseInt(col), 'o');
+  };
+  
+  return makeAiMove;
 }

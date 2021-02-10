@@ -32,6 +32,7 @@ export enum Player {
   PLAYER_2,
 }
 export type PlayerSetter = (player: Player) => void;
+export type BoardSetter = (row: number, col: number, value: BoardCell) => void;
 
 let board: BoardState;
 let potentialWins: PotentialWins;
@@ -127,6 +128,9 @@ function updateCurrentState(
 }
 
 export function setBoardState(row: number, col: number, value: BoardCell) {
+  ensureBoard();
+  ensurePotentialWins();
+
   if (row < 0 || row > 2 || col < 0 || col > 2) {
     throw new Error(
       `row and col must be integers between 0 and 2, but I received row: ${row}, col: ${col}`,
@@ -157,12 +161,15 @@ function getEmptyWinData(): PotentialWinData {
   };
 }
 
-export function reset() {
+function initializeBoard() {
   board = [
     [null, null, null],
     [null, null, null],
     [null, null, null],
   ];
+}
+
+function initializePotentialWins() {
   potentialWins = {
     'row-1': getEmptyWinData(),
     'row-2': getEmptyWinData(),
@@ -173,6 +180,23 @@ export function reset() {
     'dia-1': getEmptyWinData(),
     'dia-2': getEmptyWinData(),
   };
+}
+
+function ensureBoard() {
+  if (board === undefined) {
+    initializeBoard();
+  }
+}
+
+function ensurePotentialWins() {
+  if (potentialWins === undefined) {
+    initializePotentialWins();
+  }
+}
+
+export function reset() {
+  initializeBoard();
+  initializePotentialWins();
 }
 
 export function onBoardChange(onChange: BoardChangeHandler) {
