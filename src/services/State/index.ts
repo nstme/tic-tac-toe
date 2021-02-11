@@ -142,7 +142,7 @@ export function setBoardState(row: number, col: number, value: BoardCell) {
       `value must be one of "x, o, null" but I received ${value}`,
     );
   }
-  console.log(board, "board****");
+
   board[row][col] = value;
   // update potentialWins cache
   const verticesToUpdate = getVertices(row, col);
