@@ -27,17 +27,20 @@ export interface PotentialWinData {
 export interface PotentialWins {
   [key: string]: PotentialWinData;
 }
-export enum Player {
-  PLAYER_1,
-  PLAYER_2,
-}
+
+export type Player = 'x' | 'o';
+export type PlayerChangeHandler = (currentPlayer: Player | undefined) => void;
 export type PlayerSetter = (player: Player) => void;
 export type BoardSetter = (row: number, col: number, value: BoardCell) => void;
 
+let currentPlayer:Player = 'x';
+let winningPlayer: Player | undefined;
 let board: BoardState;
 let potentialWins: PotentialWins;
 
 const boardHandlers = new Set<BoardChangeHandler>();
+const playerHandlers = new Set<PlayerChangeHandler>();
+const winHandlers = new Set<PlayerChangeHandler>();
 export const boardMap = new Map<string, WinDirection[]>();
 
 boardMap.set('00', ['row-1', 'col-1', 'dia-1']);
@@ -50,6 +53,24 @@ boardMap.set('20', ['row-3', 'col-1', 'dia-2']);
 boardMap.set('21', ['row-3', 'col-2']);
 boardMap.set('22', ['row-3', 'col-3', 'dia-1']);
 
+export function getCurrenPlayer() {
+  return currentPlayer;
+}
+
+export function setCurrentPlayer(player: Player) {
+  currentPlayer = player;
+  emitPlayerChangeEvent();
+}
+
+export function setWinningPlayer(player: Player) {
+  winningPlayer = player;
+  emitWinChangeEvent();
+}
+
+export function getWinningPlayer() {
+  return winningPlayer;
+}
+
 export function getBoardState() {
   return [...board];
 }
@@ -61,6 +82,18 @@ export function getPotentialWinState() {
 function emitBoardChangeEvent() {
   boardHandlers.forEach((handler) => {
     handler([...board], { ...potentialWins });
+  });
+}
+
+function emitPlayerChangeEvent() {
+  playerHandlers.forEach((handler) => {
+    handler(currentPlayer);
+  });
+}
+
+function emitWinChangeEvent() {
+  winHandlers.forEach((handler) => {
+    handler(currentPlayer);
   });
 }
 
@@ -150,6 +183,7 @@ export function setBoardState(row: number, col: number, value: BoardCell) {
     updateCurrentState(row, col, value, vertex);
   });
 
+  currentPlayer = (currentPlayer === 'x') ? 'o' : 'x';
   emitBoardChangeEvent();
 }
 
@@ -197,6 +231,8 @@ function ensurePotentialWins() {
 export function reset() {
   initializeBoard();
   initializePotentialWins();
+  currentPlayer = 'x';
+  winningPlayer = undefined;
 }
 
 export function onBoardChange(onChange: BoardChangeHandler) {

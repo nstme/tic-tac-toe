@@ -300,7 +300,7 @@ describe('makeAiMove', () => {
       makeAiMove(board, potentialWinState);
     });
 
-    it('makes a move to the first available edge', () => {
+    it('doesnt make a move', () => {
       expect(setBoardState).toHaveBeenCalledTimes(0);
     })
   })

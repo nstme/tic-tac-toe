@@ -262,7 +262,7 @@ describe('WinDetector', () => {
         (vertex) => potentialWinState[vertex].state === WinState.WON,
       );
       const winningSymbol = potentialWinState[winningVertex!].currentState[0];
-      winningPlayer = winningSymbol === 'x' ? Player.PLAYER_1 : Player.PLAYER_2;
+      winningPlayer = winningSymbol === 'x' ? 'x' : 'o';
 
       winDetector(board, potentialWinState);
     });

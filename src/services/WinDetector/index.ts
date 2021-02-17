@@ -1,7 +1,7 @@
 import {
   BoardChangeHandler,
   BoardState,
-  Player,
+  // Player,
   PlayerSetter,
   BoardCell,
   PotentialWins,
@@ -21,10 +21,10 @@ export default function winDetectorFactory(setWinningPlayer: PlayerSetter) {
         //checks only first element in winning vertex as the rest are the same
         const winningCell: BoardCell = winState[vertex].currentState[0];
         if (winningCell === 'x') {
-          setWinningPlayer(Player.PLAYER_1);
+          setWinningPlayer('x');
         }
         if (winningCell === 'o') {
-          setWinningPlayer(Player.PLAYER_2);
+          setWinningPlayer('o');
         }
       }
     }
