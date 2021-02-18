@@ -18,7 +18,7 @@ describe('renderer', () => {
     renderer = uiFactory(setBoardState, output);
   });
 
-  describe('', () => {
+  describe('when setBoardState is called', () => {
     beforeEach(() => {
       const board: BoardState = [
         ['o', null, 'o'],

@@ -1,29 +1,29 @@
 import { BoardChangeHandler, BoardState, BoardSetter, PotentialWins, } from "../State";
 import readlineSync from "readline-sync";
 
-export type RenderBoard = (board: BoardState) => void;
+export type getStyledBoard = (board: BoardState) => string;
 
-function renderBoard(board: BoardState) {
-  let output: string = '';
-  let boardRender: string[][];
+function getStyledBoard(board: BoardState) {
+  let result: string = '';
+  let boardStyled: string[][];
 
-  boardRender = board.map(row => {
+  boardStyled = board.map(row => {
     return row.map((cell) => {
       return (cell !== null) ? cell.toString() : '_';
     })
   });
 
-  boardRender.forEach((row) => {
+  boardStyled.forEach((row) => {
     let [cellA, cellB, cellC] = row;
-    output += `${cellA} | ${cellB} | ${cellC}\n`;
+    result += `${cellA} | ${cellB} | ${cellC}\n`;
   });
 
-  console.log(output);
+  return result;
 }
 
 //fact funct: accepts console log, change funct
 export default function uiFactory(setBoardState: BoardSetter, output:(message: string) => void) {
-  const renderer: BoardChangeHandler = (
+  const renderer: BoardChangeHandler = async (
     board: BoardState,
     _potentialWins: PotentialWins,
   ) => {
@@ -34,11 +34,15 @@ export default function uiFactory(setBoardState: BoardSetter, output:(message: s
     //call setBoardState with user input
     //render new board
     //output is our console.log function, can be tested as mock funct in tests (see AI and Windetector)
-    renderBoard(board);
-    let message: string = readlineSync.question('What is your name?');
-    console.log('hi,username!!!', message);
+    let userName, message, index: string;
+    let row, col: number;
+    userName = readlineSync.question('What is your name?\n');
+    message = `Hi, ${userName}! Welcome to tic tac toe game\n`;
     output(message);
-    setBoardState(0, 1, 'x');
+    console.log(getStyledBoard(board));
+    index = readlineSync.question('Enter row and column number separated by space\n');
+    [row, col] = index.split(' ').map(e => parseInt(e));
+    setBoardState(row, col, 'x');
   };
 
   return renderer;
