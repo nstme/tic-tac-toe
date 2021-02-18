@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 export type BoardCell = 'x' | 'o' | null;
 export type BoardRow = BoardCell[];
 export type BoardState = BoardRow[];
@@ -33,7 +34,7 @@ export type PlayerChangeHandler = (currentPlayer: Player | undefined) => void;
 export type PlayerSetter = (player: Player) => void;
 export type BoardSetter = (row: number, col: number, value: BoardCell) => void;
 
-let currentPlayer:Player = 'x';
+let currentPlayer: Player = 'x';
 let winningPlayer: Player | undefined;
 let board: BoardState;
 let potentialWins: PotentialWins;
@@ -183,7 +184,7 @@ export function setBoardState(row: number, col: number, value: BoardCell) {
     updateCurrentState(row, col, value, vertex);
   });
 
-  currentPlayer = (currentPlayer === 'x') ? 'o' : 'x';
+  currentPlayer = currentPlayer === 'x' ? 'o' : 'x';
   emitBoardChangeEvent();
 }
 

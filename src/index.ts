@@ -1,11 +1,22 @@
-export default async function main() {
-  return 'hello world';
+import { question } from 'readline-sync';
+import aiFactory from './services/AI';
+import { setBoardState, onBoardChange, reset } from './services/State';
+import uiFactory from './services/UI';
+
+function output(message: string): void {
+  console.log(message);
 }
 
-new Promise(async () => {
-  try {
-    await main();
-  } catch (err) {
-    console.log(err);
-  }
-});
+function main() {
+  reset();
+
+  const ui = uiFactory(setBoardState, output, question);
+  const ai = aiFactory(setBoardState);
+
+  onBoardChange(ai);
+  onBoardChange(ui);
+
+  // setBoardState(0, 0, 'o');
+}
+
+main();
