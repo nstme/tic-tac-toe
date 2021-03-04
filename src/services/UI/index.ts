@@ -43,20 +43,12 @@ function getNextMove(
   return [row, col];
 }
 
-//fact funct: accepts console log, change funct
 export default function uiFactory(
   setBoardState: BoardSetter,
   output: OutputFunction,
   question: QuestionFunction,
 ): BoardChangeHandler {
   const renderer: BoardChangeHandler = (board: BoardState) => {
-    //search for 'reading user input function - readline'
-    //render board
-    //render propmpt message if user === human user
-    //validate user input
-    //call setBoardState with user input
-    //render new board
-    //output is our console.log function, can be tested as mock funct in tests (see AI and Windetector)
     output(getStyledBoard(board));
 
     const [row, col] = getNextMove(question, output);

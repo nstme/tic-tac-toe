@@ -14,6 +14,7 @@ function main() {
   const ai = aiFactory(setBoardState);
 
   onBoardChange(ai);
+  console.log('^^^^^^^');
   onBoardChange(ui);
 
   // setBoardState(0, 0, 'o');

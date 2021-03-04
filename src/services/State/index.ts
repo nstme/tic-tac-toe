@@ -54,7 +54,7 @@ boardMap.set('20', ['row-3', 'col-1', 'dia-2']);
 boardMap.set('21', ['row-3', 'col-2']);
 boardMap.set('22', ['row-3', 'col-3', 'dia-1']);
 
-export function getCurrenPlayer() {
+export function getCurrentPlayer() {
   return currentPlayer;
 }
 
@@ -184,7 +184,9 @@ export function setBoardState(row: number, col: number, value: BoardCell) {
     updateCurrentState(row, col, value, vertex);
   });
 
-  currentPlayer = currentPlayer === 'x' ? 'o' : 'x';
+  currentPlayer = getCurrentPlayer();
+  currentPlayer === 'x' ? setCurrentPlayer('o') : setCurrentPlayer('x');
+  console.log(currentPlayer, "****");
   emitBoardChangeEvent();
 }
 
@@ -237,7 +239,15 @@ export function reset() {
 }
 
 export function onBoardChange(onChange: BoardChangeHandler) {
+  console.log(boardHandlers, ' handlers');
   boardHandlers.add(onChange);
+  console.log(boardHandlers, ' handlers');
 
   onChange(board, potentialWins);
+}
+
+export function onPlayerChange(onChange: PlayerChangeHandler) {
+  playerHandlers.add(onChange);
+
+  onChange(currentPlayer);
 }
