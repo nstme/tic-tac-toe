@@ -5,6 +5,7 @@ export type BoardState = BoardRow[];
 export type BoardChangeHandler = (
   board: BoardState,
   winState: PotentialWins,
+  currentPlayer: Player,
 ) => void;
 export type WinDirection =
   | 'row-1'
@@ -33,6 +34,7 @@ export type Player = 'x' | 'o';
 export type PlayerChangeHandler = (currentPlayer: Player | undefined) => void;
 export type PlayerSetter = (player: Player) => void;
 export type BoardSetter = (row: number, col: number, value: BoardCell) => void;
+// export type WinChangeHandler = (currentPlayer: Player | undefined) => void;
 
 let currentPlayer: Player = 'x';
 let winningPlayer: Player | undefined;
@@ -41,7 +43,7 @@ let potentialWins: PotentialWins;
 
 const boardHandlers = new Set<BoardChangeHandler>();
 const playerHandlers = new Set<PlayerChangeHandler>();
-const winHandlers = new Set<PlayerChangeHandler>();
+// const winHandlers = new Set<BoardChangeHandler>();
 export const boardMap = new Map<string, WinDirection[]>();
 
 boardMap.set('00', ['row-1', 'col-1', 'dia-1']);
@@ -65,7 +67,8 @@ export function setCurrentPlayer(player: Player) {
 
 export function setWinningPlayer(player: Player) {
   winningPlayer = player;
-  emitWinChangeEvent();
+  // emitWinChangeEvent();
+  emitBoardChangeEvent();
 }
 
 export function getWinningPlayer() {
@@ -82,7 +85,7 @@ export function getPotentialWinState() {
 
 function emitBoardChangeEvent() {
   boardHandlers.forEach((handler) => {
-    handler([...board], { ...potentialWins });
+    handler([...board], { ...potentialWins }, currentPlayer);
   });
 }
 
@@ -92,11 +95,11 @@ function emitPlayerChangeEvent() {
   });
 }
 
-function emitWinChangeEvent() {
-  winHandlers.forEach((handler) => {
-    handler(currentPlayer);
-  });
-}
+// function emitWinChangeEvent() {
+//   winHandlers.forEach((handler) => {
+//     handler(board, potentialWins, currentPlayer);
+//   });
+// }
 
 function getVertices(row: number, col: number) {
   const verticesToUpdate: WinDirection[] | undefined = boardMap.get(
@@ -184,9 +187,8 @@ export function setBoardState(row: number, col: number, value: BoardCell) {
     updateCurrentState(row, col, value, vertex);
   });
 
-  currentPlayer = getCurrentPlayer();
-  currentPlayer === 'x' ? setCurrentPlayer('o') : setCurrentPlayer('x');
-  console.log(currentPlayer, "****");
+  currentPlayer = currentPlayer === 'x' ? 'o' : 'x';
+
   emitBoardChangeEvent();
 }
 
@@ -239,11 +241,9 @@ export function reset() {
 }
 
 export function onBoardChange(onChange: BoardChangeHandler) {
-  console.log(boardHandlers, ' handlers');
   boardHandlers.add(onChange);
-  console.log(boardHandlers, ' handlers');
 
-  onChange(board, potentialWins);
+  onChange(board, potentialWins, currentPlayer);
 }
 
 export function onPlayerChange(onChange: PlayerChangeHandler) {
@@ -251,3 +251,9 @@ export function onPlayerChange(onChange: PlayerChangeHandler) {
 
   onChange(currentPlayer);
 }
+
+// export function onWinChange(onChange: BoardChangeHandler) {
+//   winHandlers.add(onChange);
+
+//   onChange(board, potentialWins, currentPlayer);
+// }

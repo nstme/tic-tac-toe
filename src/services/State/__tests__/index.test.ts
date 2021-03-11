@@ -236,6 +236,7 @@ describe('the State service', () => {
               cellCount: 0,
             },
           },
+          'o',
         );
       });
     });
@@ -306,6 +307,7 @@ describe('the State service', () => {
               cellCount: 0,
             },
           },
+          'o',
         );
       });
     });

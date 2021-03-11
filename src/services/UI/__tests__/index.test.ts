@@ -3,6 +3,7 @@ import {
   PotentialWins,
   WinState,
   BoardChangeHandler,
+  reset,
 } from '../../State';
 
 import uiFactory from '../';
@@ -14,6 +15,7 @@ describe('renderer', () => {
   let renderer: BoardChangeHandler;
 
   beforeEach(() => {
+    reset();
     setBoardState = jest.fn();
     output = jest.fn();
     question = jest.fn(() => {
@@ -21,6 +23,126 @@ describe('renderer', () => {
     });
 
     renderer = uiFactory(setBoardState, output, question);
+  });
+
+  describe('when the board is in a draw state', () => {
+    const message = 'Draw';
+    beforeEach(() => {
+      reset();
+      const board: BoardState = [
+        ['o', 'x', 'o'],
+        ['x', 'o', 'x'],
+        ['x', 'o', 'x'],
+      ];
+      const potentialWinState: PotentialWins = {
+        'row-1': {
+          currentState: ['o', 'x', 'o'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 3,
+        },
+        'row-2': {
+          currentState: ['x', 'o', 'x'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 3,
+        },
+        'row-3': {
+          currentState: ['x', 'o', 'x'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 3,
+        },
+        'col-1': {
+          currentState: ['o', 'x', 'x'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 3,
+        },
+        'col-2': {
+          currentState: ['x', 'o', 'o'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 3,
+        },
+        'col-3': {
+          currentState: ['o', 'x', 'x'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 3,
+        },
+        'dia-1': {
+          currentState: ['o', 'o', 'x'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 3,
+        },
+        'dia-2': {
+          currentState: ['x', 'o', 'o'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 3,
+        },
+      };
+      renderer(board, potentialWinState, 'o');
+    });
+    it('renders draw message', () => {
+      expect(output).toHaveBeenCalledWith(message);
+    });
+    it('renders board and message ', () => {
+      expect(output).toHaveBeenCalledTimes(2);
+    });
+  });
+  //todo
+  describe('when the board is in a win state', () => {
+    const message = 'Player x won';
+    beforeEach(() => {
+      reset();
+      const board: BoardState = [
+        ['o', 'o', 'x'],
+        [null, 'x', null],
+        ['x', null, 'o'],
+      ];
+      const potentialWinState: PotentialWins = {
+        'row-1': {
+          currentState: ['o', 'o', 'x'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 3,
+        },
+        'row-2': {
+          currentState: [null, 'x', null],
+          state: WinState.WINNABLE,
+          cellCount: 1,
+        },
+        'row-3': {
+          currentState: ['x', null, 'o'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 2,
+        },
+        'col-1': {
+          currentState: ['o', null, 'x'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 2,
+        },
+        'col-2': {
+          currentState: ['o', 'x', null],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 2,
+        },
+        'col-3': {
+          currentState: ['x', null, 'o'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 2,
+        },
+        'dia-1': {
+          currentState: ['o', 'x', 'o'],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 3,
+        },
+        'dia-2': {
+          currentState: ['x', 'x', 'x'],
+          state: WinState.WON,
+          cellCount: 3,
+        },
+      };
+      renderer(board, potentialWinState, 'x');
+    });
+
+    it('reders win message', () => {
+      expect(output).toHaveBeenCalledWith(message);
+    });
   });
 
   describe('when setBoardState is called', () => {
@@ -73,7 +195,7 @@ describe('renderer', () => {
         },
       };
 
-      renderer(board, potentialWinState);
+      renderer(board, potentialWinState, 'o');
     });
 
     it('asks for the user input', () => {
@@ -99,14 +221,14 @@ _ | _ | _
   });
 
   describe('given only one input', () => {
-    it('Prints and error message and tries again');
+    it.todo('Prints and error message and tries again');
   });
 
   describe('given out of range input', () => {
-    it('Prints and error message and tries again');
+    it.todo('Prints and error message and tries again');
   });
 
   describe('given non-numeric input', () => {
-    it('Prints and error message and tries again');
+    it.todo('Prints and error message and tries again');
   });
 });

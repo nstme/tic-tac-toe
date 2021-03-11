@@ -245,7 +245,7 @@ describe('WinDetector', () => {
   describe('a losing board state', () => {
     beforeEach(() => {
       const potentialWinState = getLosingState();
-      winDetector(board, potentialWinState);
+      winDetector(board, potentialWinState, 'o');
     });
 
     it('it does not update state', () => {
@@ -264,7 +264,7 @@ describe('WinDetector', () => {
       const winningSymbol = potentialWinState[winningVertex!].currentState[0];
       winningPlayer = winningSymbol === 'x' ? 'x' : 'o';
 
-      winDetector(board, potentialWinState);
+      winDetector(board, potentialWinState, 'o');
     });
 
     it('it calls setWinningPlayer', () => {

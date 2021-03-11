@@ -7,6 +7,7 @@ import {
   WinDirection,
   BoardChangeHandler,
   BoardSetter,
+  Player,
 } from '../State';
 
 interface BoardMapObject {
@@ -109,7 +110,11 @@ export default function aiFactory(
   const makeAiMove: BoardChangeHandler = (
     board: BoardState,
     potentialWins: PotentialWins,
+    currentPlayer: Player,
   ) => {
+    if (currentPlayer !== 'o') {
+      return;
+    }
     const winnableVertices = getWinnableVertices(potentialWins);
 
     if (Object.keys(winnableVertices).length === 0) {

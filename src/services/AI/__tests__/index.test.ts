@@ -16,6 +16,63 @@ describe('makeAiMove', () => {
     makeAiMove = aiFactory(setBoardState);
   });
 
+  describe('when the player is "x"', () => {
+    beforeEach(() => {
+      const board: BoardState = [
+        ['o', null, 'o'],
+        ['x', null, 'x'],
+        [null, null, null],
+      ]
+      const potentialWinState: PotentialWins = {
+        'row-1': {
+          currentState: ['o', null, 'o'],
+          state: WinState.WINNABLE,
+          cellCount: 2,
+        },
+        'row-2': {
+          currentState: ['x', null, 'x'],
+          state: WinState.WINNABLE,
+          cellCount: 2,
+        },
+        'row-3': {
+          currentState: [null, null, null],
+          state: WinState.WINNABLE,
+          cellCount: 0,
+        },
+        'col-1': {
+          currentState: ['o', 'x', null],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 2,
+        },
+        'col-2': {
+          currentState: [null, null, null],
+          state: WinState.WINNABLE,
+          cellCount: 0,
+        },
+        'col-3': {
+          currentState: ['o', 'x', null],
+          state: WinState.NOT_WINNABLE,
+          cellCount: 2,
+        },
+        'dia-1': {
+          currentState: ['o', null, null],
+          state: WinState.WINNABLE,
+          cellCount: 1,
+        },
+        'dia-2': {
+          currentState: [null, null, 'o'],
+          state: WinState.WINNABLE,
+          cellCount: 1,
+        },
+      };
+      makeAiMove(board, potentialWinState, 'x');
+    });
+
+    it.only('does not make a move', () => {
+      expect(setBoardState).toHaveBeenCalledTimes(0);
+    })
+  })
+
   describe('when there is a winning move for AI Player_2', () => {
     beforeEach(() => {
       const board: BoardState = [
@@ -65,7 +122,7 @@ describe('makeAiMove', () => {
           cellCount: 1,
         },
       };
-      makeAiMove(board, potentialWinState);
+      makeAiMove(board, potentialWinState, 'o');
     });
 
     it('calls setBoardState', () => {
@@ -126,7 +183,7 @@ describe('makeAiMove', () => {
           cellCount: 2,
         },
       };
-      makeAiMove(board, potentialWinState);
+      makeAiMove(board, potentialWinState, 'o');
     });
 
     it('blocks Player_1 winning move', () => {
@@ -183,7 +240,7 @@ describe('makeAiMove', () => {
           cellCount: 0,
         },
       };
-      makeAiMove(board, potentialWinState);
+      makeAiMove(board, potentialWinState, 'o');
     });
 
     it('makes a move to the center cell', () => {
@@ -240,7 +297,7 @@ describe('makeAiMove', () => {
           cellCount: 1,
         },
       };
-      makeAiMove(board, potentialWinState);
+      makeAiMove(board, potentialWinState, 'o');
     });
 
     it('makes a move to the first available corner cell', () => {
@@ -297,7 +354,7 @@ describe('makeAiMove', () => {
           cellCount: 3,
         },
       };
-      makeAiMove(board, potentialWinState);
+      makeAiMove(board, potentialWinState, 'o');
     });
 
     it('doesnt make a move', () => {

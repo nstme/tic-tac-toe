@@ -1,4 +1,10 @@
-import { BoardChangeHandler, BoardState, BoardSetter } from '../State';
+import {
+  BoardChangeHandler,
+  BoardState,
+  BoardSetter,
+  PotentialWins,
+  WinState,
+} from '../State';
 import { BasicOptions } from 'readline-sync';
 
 export type getStyledBoard = (board: BoardState) => string;
@@ -11,13 +17,13 @@ export type OutputFunction = (message: string) => void;
 function getStyledBoard(board: BoardState) {
   let result = '';
 
-  const boardStyled = board.map((row) => {
+  const styledBoard = board.map((row) => {
     return row.map((cell) => {
       return cell !== null ? cell.toString() : '_';
     });
   });
 
-  boardStyled.forEach((row) => {
+  styledBoard.forEach((row) => {
     const [cellA, cellB, cellC] = row;
 
     result += `${cellA} | ${cellB} | ${cellC}\n`;
@@ -43,13 +49,49 @@ function getNextMove(
   return [row, col];
 }
 
+function isDrawState(potentialWins: PotentialWins) {
+  return (
+    Object.keys(potentialWins).find(
+      (key) => potentialWins[key].state !== WinState.NOT_WINNABLE,
+    ) === undefined
+  );
+}
+
+function isWinState(potentialWins: PotentialWins) {
+  let winningPlayerSymbol = undefined;
+  for (const vertex in potentialWins) {
+    if (potentialWins[vertex].state === WinState.WON) {
+      //checks only first element in winning vertex as the rest are the same
+      const winningCell = potentialWins[vertex].currentState[0];
+      if (winningCell) {
+        winningPlayerSymbol = winningCell;
+      }
+    }
+  }
+  return winningPlayerSymbol;
+}
+
 export default function uiFactory(
   setBoardState: BoardSetter,
   output: OutputFunction,
   question: QuestionFunction,
 ): BoardChangeHandler {
-  const renderer: BoardChangeHandler = (board: BoardState) => {
+  const renderer: BoardChangeHandler = (
+    board: BoardState,
+    potentialWins: PotentialWins,
+  ) => {
     output(getStyledBoard(board));
+
+    if (isDrawState(potentialWins)) {
+      output('Draw');
+      return;
+    }
+
+    if (isWinState(potentialWins)) {
+      const winningPlayerSymbol = isWinState(potentialWins);
+      output(`Player ${winningPlayerSymbol} won`);
+      return;
+    }
 
     const [row, col] = getNextMove(question, output);
 
