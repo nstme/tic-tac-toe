@@ -36,15 +36,20 @@ function getNextMove(
   question: QuestionFunction,
   output: OutputFunction,
 ): [number, number] {
-  const index = question('Enter row and column number separated by space\n');
+  const userIndexInput = question(
+    'Enter row and column number separated by space\n',
+  );
 
-  const [row, col] = index.split(' ').map((e: string) => parseInt(e));
+  const formatCheck = userIndexInput.match(/^[0-2] [0-2]$/gm);
 
-  if (row < 0 || row > 2 || col < 0 || col > 2) {
-    output('row and column must be between 0 and 2 inclusive.');
-
+  if (!formatCheck) {
+    output(
+      'Row and column must be between 0 and 2 inclusive and separated by space',
+    );
     return getNextMove(question, output);
   }
+
+  const [row, col] = userIndexInput.split(' ').map((e: string) => parseInt(e));
 
   return [row, col];
 }

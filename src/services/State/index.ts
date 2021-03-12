@@ -68,7 +68,7 @@ export function setCurrentPlayer(player: Player) {
 export function setWinningPlayer(player: Player) {
   winningPlayer = player;
   // emitWinChangeEvent();
-  emitBoardChangeEvent();
+  // emitBoardChangeEvent();
 }
 
 export function getWinningPlayer() {

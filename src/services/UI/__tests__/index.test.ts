@@ -85,7 +85,7 @@ describe('renderer', () => {
       expect(output).toHaveBeenCalledTimes(2);
     });
   });
-  //todo
+
   describe('when the board is in a win state', () => {
     const message = 'Player x won';
     beforeEach(() => {
@@ -221,14 +221,68 @@ _ | _ | _
   });
 
   describe('given only one input', () => {
-    it.todo('Prints and error message and tries again');
+    let getNextMove: jest.Mock = jest.fn();
+    let question: jest.Mock = jest.fn(() => {
+      return '1';
+    });
+    const errorMessage =
+      'Row and column must be between 0 and 2 inclusive and separated by space';
+
+    beforeEach(() => {
+      reset();
+      const formatCheck = question().match(/^[0-2] [0-2]$/gm);
+      if (!formatCheck) {
+        output(errorMessage);
+        getNextMove(question, output);
+      }
+    });
+    it('Prints and error message and tries again', () => {
+      expect(output).toHaveBeenCalledWith(errorMessage);
+      expect(getNextMove).toHaveBeenCalledWith(question, output);
+    });
   });
 
   describe('given out of range input', () => {
-    it.todo('Prints and error message and tries again');
+    let getNextMove: jest.Mock = jest.fn();
+    let question: jest.Mock = jest.fn(() => {
+      return '3 1';
+    });
+    const errorMessage =
+      'Row and column must be between 0 and 2 inclusive and separated by space';
+
+    beforeEach(() => {
+      reset();
+      const formatCheck = question().match(/^[0-2] [0-2]$/gm);
+      if (!formatCheck) {
+        output(errorMessage);
+        getNextMove(question, output);
+      }
+    });
+    it('Prints and error message and tries again', () => {
+      expect(output).toHaveBeenCalledWith(errorMessage);
+      expect(getNextMove).toHaveBeenCalledWith(question, output);
+    });
   });
 
   describe('given non-numeric input', () => {
-    it.todo('Prints and error message and tries again');
+    let getNextMove: jest.Mock = jest.fn();
+    let question: jest.Mock = jest.fn(() => {
+      return 'a 1';
+    });
+    const errorMessage =
+      'Row and column must be between 0 and 2 inclusive and separated by space';
+
+    beforeEach(() => {
+      reset();
+      const formatCheck = question().match(/^[0-2] [0-2]$/gm);
+      if (!formatCheck) {
+        output(errorMessage);
+        getNextMove(question, output);
+      }
+    });
+    it('Prints and error message and tries again', () => {
+      expect(output).toHaveBeenCalledWith(errorMessage);
+      expect(getNextMove).toHaveBeenCalledWith(question, output);
+    });
   });
 });

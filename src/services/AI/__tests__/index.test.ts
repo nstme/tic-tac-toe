@@ -22,7 +22,7 @@ describe('makeAiMove', () => {
         ['o', null, 'o'],
         ['x', null, 'x'],
         [null, null, null],
-      ]
+      ];
       const potentialWinState: PotentialWins = {
         'row-1': {
           currentState: ['o', null, 'o'],
@@ -70,8 +70,8 @@ describe('makeAiMove', () => {
 
     it.only('does not make a move', () => {
       expect(setBoardState).toHaveBeenCalledTimes(0);
-    })
-  })
+    });
+  });
 
   describe('when there is a winning move for AI Player_2', () => {
     beforeEach(() => {
@@ -79,8 +79,8 @@ describe('makeAiMove', () => {
         ['o', null, 'o'],
         ['x', null, 'x'],
         [null, null, null],
-      ]
-      const potentialWinState:PotentialWins = {
+      ];
+      const potentialWinState: PotentialWins = {
         'row-1': {
           currentState: ['o', null, 'o'],
           state: WinState.WINNABLE,
@@ -131,7 +131,7 @@ describe('makeAiMove', () => {
 
     it('makes a winning move', () => {
       expect(setBoardState).toHaveBeenCalledWith(0, 1, 'o');
-    })
+    });
   });
 
   describe('when there is a winning move for human Player_1', () => {
@@ -188,7 +188,7 @@ describe('makeAiMove', () => {
 
     it('blocks Player_1 winning move', () => {
       expect(setBoardState).toHaveBeenCalledWith(2, 0, 'o');
-    })
+    });
   });
 
   describe('when center cell is not taken', () => {
@@ -245,7 +245,7 @@ describe('makeAiMove', () => {
 
     it('makes a move to the center cell', () => {
       expect(setBoardState).toHaveBeenCalledWith(1, 1, 'o');
-    })
+    });
   });
 
   describe('when center cell is taken, but corner cell is empty', () => {
@@ -302,7 +302,7 @@ describe('makeAiMove', () => {
 
     it('makes a move to the first available corner cell', () => {
       expect(setBoardState).toHaveBeenCalledWith(0, 2, 'o');
-    })
+    });
   });
 
   describe('when there is a draw', () => {
@@ -359,6 +359,6 @@ describe('makeAiMove', () => {
 
     it('doesnt make a move', () => {
       expect(setBoardState).toHaveBeenCalledTimes(0);
-    })
-  })
-})
+    });
+  });
+});
